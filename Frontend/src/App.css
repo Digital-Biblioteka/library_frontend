@@ -3,32 +3,61 @@
   margin-top: 100px;
 }
 
-.open-book-btn {
-  padding: 12px 24px;
-  background-color: #ee71aa;
+.search-btn {
+  padding: 10px 24px;
+  background-color: #E35B91;
   color: white;
   font-size: 18px;
   border: none;
   border-radius: 8px;
   cursor: pointer;
+  position: absolute;
+  top: 400px;
+  right: 550px;
 }
 
-.open-book-btn:hover {
-  background-color: #b74985;
-}
-
-.sing-up-btn {
-  padding: 12px 24px;
+.search-btn:hover {
   background-color: #ee71aa;
+}
+
+.search-field {
+  text-align: left;
+  padding: 10px 24px;
+  font-size: 16px;
+  position: absolute;
+  top: 400px;
+  right: 670px;
+  border-radius: 8px;
+}
+
+.sign-up-btn {
+  padding: 10px 24px;
+  background-color: #E35B91;
   color: white;
-  font-size: 18px;
-  border: none;
+  font-size: 16px;
+  border: thin black;
   border-radius: 8px;
   position: absolute;
   top: 20px;
   right: 20px;
 }
 
-.sing-up-btn:hover {
-  background-color: #b74985;
+.sign-up-btn:hover {
+  background-color: #ee71aa;
+}
+
+.sign-in-btn {
+  padding: 10px 24px;
+  background-color: #FFB1D0;
+  color: black;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  position: absolute;
+  top: 20px;
+  right: 240px;
+}
+
+.sign-in-btn:hover {
+  background-color: #E35B91;
 }

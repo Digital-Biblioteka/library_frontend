@@ -3,21 +3,32 @@ import "./App.css";
 import Reader from "./Reader";
 import SignIn from "./Sign In";
 
+
 function HomePage() {
     const navigate = useNavigate();
 
     return (
         <div className="App">
+            <div className="header">
+                <button className="sign-in-btn"
+                        onClick={() => navigate("/sign-in")}>
+                    Войти
+                </button>
+
+                <button className="sign-up-btn"
+                        onClick={() => navigate("/sign-up")}>
+                    Зарегистрироваться
+                </button>
+            </div>
+
+            <input className="search-field"
+                   defaultValue="я ищу..."
+            />
             <button
-                className="open-book-btn"
+                className="search-btn"
                 onClick={() => navigate("/reader")}
             >
-                ХОЧУ ЧИТАТЬ!!!
-            </button>
-
-            <button className="sing-up-btn"
-                    onClick={() => navigate("/sign-in")}>
-                Sing IN
+                Поиск
             </button>
         </div>
     );
