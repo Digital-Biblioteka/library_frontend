@@ -42,6 +42,8 @@ function HomePage() {
                 </button>
             </div>
 
+            <text className="label"> Cупер мега крутая онлайн библиотека класс вау 🔥</text>
+
             <div className="search-container">
                 <input
                     className="search-field"

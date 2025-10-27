@@ -10,6 +10,14 @@
 }
 
 
+.label{
+  text-align: center;
+  color: black;
+  font-size: 50px;
+  font-weight: bold;
+  margin: 10px;
+}
+
 .header {
   position: absolute;
   top: 20px;
@@ -21,34 +29,36 @@
   background-color: #E35B91;
   color: white;
   font-size: 16px;
-  border: none;
+  border: 1px solid #000000;
   border-radius: 8px;
   margin-left: 10px
 }
 
 .sign-up-btn:hover {
-  background-color: #ee71aa;
+  background-color: #FFB1D0;
+  color: black;
 }
 
 .sign-in-btn {
   padding: 10px 24px;
-  background-color: #FFB1D0;
-  color: black;
+  background-color: #E35B91;
+  color: white;
   font-size: 16px;
-  border: none;
+  border: 1px solid #000000;
   border-radius: 8px;
   margin-left: 10px
 }
 
 .sign-in-btn:hover {
-  background-color: #E35B91;
+  background-color: #FFB1D0;
+  color: black;
 }
 
 .search-container {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px; /* Расстояние между полем и кнопкой */
+  gap: 5px;
 }
 
 .search-field {
@@ -56,8 +66,8 @@
   padding: 10px 24px;
   font-size: 16px;
   border-radius: 8px;
-  border: none;
-  width: 300px;
+  border: 1px solid #ccc;
+  width: 200px;
 }
 
 .search-btn {
@@ -65,13 +75,14 @@
   background-color: #E35B91;
   color: white;
   font-size: 16px;
-  border: none;
+  border: 1px solid #000000;
   border-radius: 8px;
   cursor: pointer;
-  margin: 10px;
+  margin: 5px;
 }
 
 .search-btn:hover {
-  background-color: #ee71aa;
+  background-color: #FFB1D0;
+  color: black;
 }
 
