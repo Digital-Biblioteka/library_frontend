@@ -9,19 +9,31 @@
   position: relative;
 }
 
-
-.label{
-  text-align: center;
-  color: black;
-  font-size: 50px;
-  font-weight: bold;
-  margin: 10px;
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  box-sizing: border-box;
 }
 
-.header {
-  position: absolute;
-  top: 20px;
-  right: 20px;
+.hello-user {
+  display: flex;
+  align-items: center;
+  font-size: 18px;
+  color: #333;
+  font-weight: 500;
+}
+
+.buttons-party {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .sign-up-btn {
@@ -54,11 +66,29 @@
   color: black;
 }
 
+.label {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: black;
+  font-size: 50px;
+  font-weight: bold;
+  width: 90%;
+  text-align: center;
+  line-height: 1.2;
+}
+
 .search-container {
+  position: relative;
+  bottom: 250px;
+  margin-top: auto;
+  width: 100%;
   display: flex;
-  align-items: center;
   justify-content: center;
-  gap: 5px;
+  gap: 8px;
+  padding: 20px 0 40px;
+  background-color: transparent;
 }
 
 .search-field {
@@ -68,6 +98,7 @@
   border-radius: 8px;
   border: 1px solid #ccc;
   width: 200px;
+  outline: none;
 }
 
 .search-btn {

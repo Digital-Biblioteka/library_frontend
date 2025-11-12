@@ -1,0 +1,68 @@
+.home-user {
+    min-height: 100vh;
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+}
+
+.logout-btn {
+    padding: 10px 24px;
+    background-color: #E35B91;
+    color: white;
+    font-size: 16px;
+    border: 1px solid #000000;
+    border-radius: 8px;
+    margin-left: 10px
+}
+
+.logout-btn:hover {
+    background-color: #FFB1D0;
+    color: black;
+}
+
+.user-tabs {
+    position: sticky;
+    top: 60px;
+    width: 100%;
+    display: flex;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+    z-index: 500;
+}
+
+.tab {
+    flex: 1;
+    background: transparent;
+    border: none;
+    font-size: 16px;
+    font-weight: 500;
+    color: #FFB1D0;
+    padding: 14px 0;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.tab:hover {
+    background: rgb(248, 222, 235);
+    color: rgba(225, 105, 151, 0.69);
+}
+
+.tab.active {
+    color: #E35B91;
+    border-bottom: 3px solid #E35B91;
+    background: rgb(224, 192, 205);
+}
+
+.book-list {
+    margin-top: 20px;
+    padding: 80px 20px 100px; /* отступы сверху и снизу */
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
+    width: 100%;
+    box-sizing: border-box;
+}
