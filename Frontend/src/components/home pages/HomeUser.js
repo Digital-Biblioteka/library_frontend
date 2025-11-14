@@ -2,10 +2,10 @@ import {useNavigate} from "react-router-dom";
 import {useState} from "react";
 import "../../style/home.css";
 import "../../style/user-home.css"
-//import { getUserName, logout } from "../utils/auth";
+import {getUsername, logout} from "../../utils/AuthToken";
 
 function HomeUser() {
-    //const username = getUsername();
+    const username = getUsername();
     const navigate = useNavigate();
     const [searchValue, setSearchValue] = useState('');
 
@@ -20,11 +20,11 @@ function HomeUser() {
 
             <div className="home-user">
                 <div className="header">
-                    <label className="hello-user">Hello, {}</label>
+                    <label className="hello-user">Рады вас видеть, {username}</label>
 
                     <div className="buttons-party">
                         <button className="logout-btn"
-                            //onClick={}
+                            onClick={logout}
                         >
                             Выйти
                         </button>

@@ -8,7 +8,7 @@ function App() {
         <Router>
             <Routes>
                 <Route path="/" element={<HomePage />} />
-                <Route path="/reader" element={<Reader />} /> //переход на читалку временный
+                <Route path="/reader" element={<Reader />} />
                 <Route path="/sign-in" element={<AuthForm mode="signin" />}></Route>
                 <Route path="/sign-up" element={<AuthForm mode="signup" />}></Route>
             </Routes>

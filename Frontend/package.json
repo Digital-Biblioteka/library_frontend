@@ -13,6 +13,7 @@
     "react-reader": "^2.0.15",
     "react-router-dom": "^7.9.4",
     "react-scripts": "5.0.1",
+    "react-select": "^5.10.2",
     "web-vitals": "^2.1.4"
   },
   "scripts": {

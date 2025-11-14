@@ -5,7 +5,7 @@ const API_BASE = "http://localhost:8080/auth";
  * @returns {Promise<{token: string}>}
  */
 export async function signUp(userData) {
-    const res = await fetch(`${API_BASE}/signup`, {
+    const res = await fetch(`${API_BASE}/sign-up`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(userData),
@@ -20,11 +20,11 @@ export async function signUp(userData) {
 }
 
 /**
- * @param {Object} credentials { username, password }
+ * @param {Object} credentials { email, password }
  * @returns {Promise<{token: string}>}
  */
 export async function signIn(credentials) {
-    const res = await fetch(`${API_BASE}/signin`, {
+    const res = await fetch(`${API_BASE}/sign-in`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(credentials),
@@ -35,5 +35,5 @@ export async function signIn(credentials) {
         throw new Error(`Ошибка входа: ${msg}`);
     }
 
-    return res.json();
+    return await res.json();
 }

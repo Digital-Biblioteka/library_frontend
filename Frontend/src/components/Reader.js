@@ -10,13 +10,11 @@ const Reader = () => {
     }
     return (
         <div className="Reader">
-            <div className="read-form">
                 <ReactReader
                     location={location}
                     locationChanged={locationChanged}
                     url="https://react-reader.metabits.no/files/alice.epub"
                 />
-            </div>
         </div>
     )
 }

@@ -27,7 +27,7 @@ function HomeGuest() {
                 </div>
             </div>
 
-            <text className="label"> Cупер мега крутая онлайн библиотека класс вау 💯</text>
+            <label className="label"> Cупер мега крутая онлайн библиотека класс вау 💯</label>
 
             <div className="search-container">
                 <input

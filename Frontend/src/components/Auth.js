@@ -34,6 +34,7 @@ function AuthForm({ mode = "signin" }) {
             email: "",
             password: "",
         },
+
         validate: (values) => validate(values, mode),
         onSubmit: async (values) => {
             try {
@@ -47,17 +48,17 @@ function AuthForm({ mode = "signin" }) {
                     });
                 } else {
                     response = await signIn({
-                        username: values.Username || values.email,
+                        email: values.email,
                         password: values.password,
                     });
                 }
 
                 localStorage.setItem("token", response.token);
-                alert("Успешно!");
-                navigate("/reader");
+                console.log("Успешно ура!!")
+                navigate("/");
             } catch (err) {
                 alert(err.message);
-                console.log(err.message())
+                console.log(err.message)
             }
         },
     });

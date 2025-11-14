@@ -1,0 +1,159 @@
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-window {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    width: 420px;
+    max-width: 90%;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    animation: scaleIn 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.modal-window h2 {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.modal-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    width: 100%;
+}
+
+.modal-form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: 10px;
+}
+
+/* Обычные input'ы */
+.modal-form input[type="text"],
+.modal-form input[type="file"],
+.rs__control { /* react-select */
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 16px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    outline: none;
+    box-sizing: border-box;
+}
+
+/* Фокус */
+.modal-form input:focus,
+.modal-form textarea:focus,
+.rs__control--is-focused {
+    border-color: #E35B91 !important;
+    box-shadow: 0 0 0 1px #E35B91 !important;
+}
+
+/* Поле описания — увеличенное */
+.modal-form textarea {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 16px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    min-height: 100px;
+    resize: vertical;
+    box-sizing: border-box;
+}
+
+.rs__control {
+    min-height: 48px !important;
+}
+
+.rs__option--is-focused {
+    background-color: #ffe1ef !important;
+}
+
+.rs__option--is-selected {
+    background-color: #E35B91 !important;
+}
+
+.error {
+    color: red;
+    font-size: 13px;
+    margin-top: -10px;
+    margin-bottom: 4px;
+}
+
+.action-btn,
+.add-btn,
+.save-btn,
+.cancel-btn,
+.close-btn {
+    flex: 1;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid #000000;
+    cursor: pointer;
+    font-weight: 500;
+    transition: 0.2s ease;
+}
+
+.action-btn {
+    background-color: #aaa;
+    color: white;
+}
+
+.add-btn {
+    background-color: #E35B91;
+    color: white;
+}
+
+.add-btn:hover {
+    background-color: #FFB1D0;
+}
+
+.save-btn {
+    background-color: #E35B91;
+    color: white;
+}
+
+.save-btn:hover {
+    background-color: #FFB1D0;
+}
+
+.cancel-btn {
+    background-color: #ccc;
+    color: #333;
+}
+
+.close-btn {
+    background: none;
+    color: #666;
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+.error {
+    color: red;
+    font-size: 13px;
+    text-align: left;
+}
