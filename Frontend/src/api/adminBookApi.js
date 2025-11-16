@@ -4,16 +4,13 @@ export async function addBook(bookData) {
     const res = await fetch ( `${API_BASE}/books/add`, {
         method: "POST",
         headers: { "Content-Type": "application/json",
-                     //"Authorization": `Bearer ${localStorage.getItem("token")}`
+                     "Authorization": `Bearer ${localStorage.getItem("token")}`
             },
         body: JSON.stringify(bookData),
     });
 
     if (!res.ok) {
         const msg = await res.text();
-        console.log(localStorage.getItem("token"));
         throw new Error(`Ошибка загрузки книги на сервер: ${msg}`);
     }
-
-    return res;
 }

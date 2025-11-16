@@ -1,7 +1,7 @@
 import { getUsername, logout } from "../../utils/AuthToken";
 import "../../style/home.css";
 import "../../style/admin-home.css"
-import AddBookModal from "./admin tools/AddBookForm";
+import WorkWIthBookModal from "./admin tools/BookForm";
 import {useState} from "react";
 
 export default function HomeAdmin() {
@@ -31,7 +31,7 @@ export default function HomeAdmin() {
                     <button className="admin-button">Управление пользователями</button>
                 </div>
 
-                <AddBookModal
+                <WorkWIthBookModal
                     isOpen={isModalOpen}
                     onClose={() => setIsModalOpen(false)}
                 />

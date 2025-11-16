@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import "../../../style/add-book.css";
 import {useFormik} from "formik";
 import Select from "react-select"
-import {addBook} from "../../../api/addBookApi";
+import {addBook} from "../../../api/adminBookApi";
+import {useNavigate} from "react-router-dom";
 
 const validate = (values) => {
     const errors = {};
@@ -25,15 +26,20 @@ const validate = (values) => {
 const genres = [
     { value: "fantasy", label: "Фэнтези" },
     { value: "sci-fi", label: "Фантастика" },
+    { value: "mysticism", label: "Мистика" },
     { value: "detective", label: "Детектив" },
-    { value: "romance", label: "Роман" },
-    { value: "adventure", label: "Приключения" },
+    { value: "love-story", label: "Любовный роман" },
+    { value: "historical", label: "Исторический роман"},
+    { value: "adventure", label: "Приключенчения" },
+    { value: "poetry", label: "Поэзия" },
     { value: "science", label: "Научная литература" },
+    { value: "kids", label: "Детская литература" }
 ];
 
-export default function AddBookModal({ isOpen, onClose }) {
+export default function WorkWIthBookModal({ isOpen, onClose }) {
     const [mode, setMode] = useState("main"); // "main" | "add"
     const [searchValue, setSearchValue] = useState('');
+    const navigate = useNavigate();
 
     // Formik форма для добавления книги
     const formik = useFormik({
@@ -50,9 +56,7 @@ export default function AddBookModal({ isOpen, onClose }) {
         onSubmit: async (values) => {
             try {
                 console.log("📘 Отправка книги:", values);
-                let resp;
-
-                resp = await addBook({
+                await addBook({
                     mode: "manual",
                     link: values.file,
                     bookDTO: {
@@ -65,9 +69,6 @@ export default function AddBookModal({ isOpen, onClose }) {
                         linkToBook: values.file
                     }
                 });
-
-                console.log(resp);
-
                 alert("Книга успешно добавлена!");
                 setMode("main");
             } catch (err) {
@@ -86,6 +87,10 @@ export default function AddBookModal({ isOpen, onClose }) {
     const handleSearchChange = (e) => {
         setSearchValue(e.target.value);
     };
+
+    const handleShowAllBooks = () => {
+        navigate("/book-list");
+    }
 
 
     return (
@@ -111,7 +116,12 @@ export default function AddBookModal({ isOpen, onClose }) {
                             </div>
 
                             <div className="modal-buttons">
-                                <button className="action-btn">Показать все книги</button>
+                                <button
+                                    className="action-btn"
+                                    onClick={handleShowAllBooks}
+                                >
+                                    Показать все книги
+                                </button>
                                 <button
                                     className="add-btn"
                                     onClick={() => setMode("add")}

@@ -1,0 +1,74 @@
+import React, { useEffect, useState } from "react";
+import { getAllBooks } from "../api/bookListApi";
+import { useNavigate } from "react-router-dom";
+import "../style/book-list.css";
+
+export default function BooksList() {
+    const [books, setBooks] = useState([]);
+    const navigate = useNavigate();
+    const [searchValue, setSearchValue] = useState('');
+
+
+    useEffect(() => {
+        getAllBooks().then(async (loadedBooks) => {
+            setBooks(loadedBooks);
+        }).catch(console.error);
+    }, []);
+
+    const handleChange = (e) => {
+        setSearchValue(e.target.value);
+    };
+
+    return (
+        <div className="books-wrapper">
+
+            <div className="top-bar">
+                <button className="back-btn" onClick={() => navigate("/")}> ↩ </button>
+                <h1>Cупер мега крутая онлайн библиотека класс вау 💯</h1>
+                <div>
+                    <input
+                        placeholder="я ищу..."
+                        className="search-field"
+                        onChange={handleChange}
+                    />
+                    <button
+                        className="search-btn"
+                        onClick={() => navigate("/reader")}
+                    >
+                        Поиск
+                    </button>
+                </div>
+            </div>
+
+            <div className="content-area">
+
+                <div className="filters">
+                    <h3>Фильтры</h3>
+                    <label>Жанры:</label>
+                    <select disabled>
+                        <option>Пока не работает</option>
+                    </select>
+
+                    <label>Издательство:</label>
+                    <select disabled>
+                        <option>Пока не работает</option>
+                    </select>
+                </div>
+
+                <div className="books-grid">
+                    {books.map((book) => (
+                        <div className="book-card" key={book.id}>
+                            <img
+                                src={"/kitten.jpg"}
+                                alt={book.title}
+                                className="book-cover"
+                            />
+                            <h3 className="book-title">{book.title}</h3>
+                            <p className="book-author">{book.author}</p>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+}
