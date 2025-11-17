@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "../../../style/add-book.css";
+import "../../../style/modal-window.css";
 import {useFormik} from "formik";
 import Select from "react-select"
 import {addBook} from "../../../api/adminBookApi";
@@ -101,7 +101,10 @@ export default function WorkWIthBookModal({ isOpen, onClose }) {
             >
                 {mode === "main" && (
                     <>
-                        <h2>Управление книгами</h2>
+                        <div className="modal-header">
+                            <h2>Управление книгами</h2>
+                            <button className="close-btn" onClick={onClose}> X </button>
+                        </div>
                         <div className="modal-content">
                             <div className="search">
                                 <input
@@ -130,10 +133,6 @@ export default function WorkWIthBookModal({ isOpen, onClose }) {
                                 </button>
                             </div>
                         </div>
-
-                        <button className="close-btn" onClick={onClose}>
-                            Закрыть
-                        </button>
                     </>
                 )}
 
