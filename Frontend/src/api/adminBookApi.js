@@ -1,12 +1,12 @@
 const API_BASE = "http://localhost:8080/api/admin/books";
 
 export async function addBook(bookData) {
-    const res = await fetch ( `${API_BASE}/add`, {
+    const res = await fetch ( `${API_BASE}`, {
         method: "POST",
-        headers: { "Content-Type": "application/json",
-                    "Authorization": `Bearer ${localStorage.getItem("token")}`
+        headers: {
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
             },
-        body: JSON.stringify(bookData)
+        body: bookData
     });
 
     if (!res.ok) {
@@ -15,17 +15,32 @@ export async function addBook(bookData) {
     }
 }
 
-export async function deleteBook(isbn) {
-    const res = await fetch(`${API_BASE}/delete`, {
+export async function deleteBook(id) {
+    const res = await fetch(`${API_BASE}/${id}`, {
         method: "DELETE",
-        headers: { "Content-Type": "application/json",
+        headers: {
             "Authorization": `Bearer ${localStorage.getItem("token")}`
         },
-        body: isbn
     });
 
     if (!res.ok) {
         const msg = await res.text();
         throw new Error(`Ошибка удаления книги: ${msg}`);
+    }
+}
+
+export async function editBook(id, book) {
+    console.log(JSON.stringify(book))
+    const res = await fetch ( `${API_BASE}/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        },
+        body: JSON.stringify(book)
+    });
+
+    if (!res.ok) {
+        const msg = await res.text();
+        throw new Error(`Ошибка редактировния данных книги: ${msg}`);
     }
 }

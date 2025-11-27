@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import "../style/book-list.css";
 import AdminEditorModal from "./home pages/admin tools/AdminBookWork";
 import {getRole} from "../utils/AuthToken";
+import {genres} from "./home pages/admin tools/Genres";
+import Select from "react-select";
 
 export default function BooksList() {
     const [books, setBooks] = useState([]);
@@ -58,14 +60,13 @@ export default function BooksList() {
                 <div className="filters">
                     <h3>Фильтры</h3>
                     <label>Жанры:</label>
-                    <select disabled>
-                        <option>Пока не работает</option>
-                    </select>
-
-                    <label>Издательство:</label>
-                    <select disabled>
-                        <option>Пока не работает</option>
-                    </select>
+                    <Select
+                        options={genres}
+                        placeholder="Выберите жанр..."
+                        //value={genres.find((g))}
+                        //onChange={(option) => formik.setFieldValue("genre", option.value)}
+                        classNamePrefix="rs"
+                    />
                 </div>
 
                 <div className="books-grid">
