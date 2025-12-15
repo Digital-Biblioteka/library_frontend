@@ -31,9 +31,10 @@ export async function deleteBook(id) {
 
 export async function editBook(id, book) {
     console.log(JSON.stringify(book))
-    const res = await fetch ( `${API_BASE}/${id}`, {
+    const res = await fetch(`${API_BASE}/${id}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json",
+        headers: {
+            "Content-Type": "application/json",
             "Authorization": `Bearer ${localStorage.getItem("token")}`
         },
         body: JSON.stringify(book)

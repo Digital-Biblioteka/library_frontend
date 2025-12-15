@@ -1,14 +1,9 @@
 import {useNavigate} from "react-router-dom";
-import {useState} from "react";
-import "../../style/home.css";
+import SearchField from "../Book/SearchField";
+import "./home.css";
 
 function HomeGuest() {
     const navigate = useNavigate();
-    const [searchValue, setSearchValue] = useState('');
-
-    const handleChange = (e) => {
-        setSearchValue(e.target.value);
-    };
 
     return (
         <div className="Home">
@@ -28,20 +23,7 @@ function HomeGuest() {
             </div>
 
             <label className="label"> Cупер мега крутая онлайн библиотека класс вау 💯</label>
-
-            <div className="search-container">
-                <input
-                    placeholder="я ищу..."
-                    className="search-field"
-                    onChange={handleChange}
-                />
-                <button
-                    className="search-btn"
-                    onClick={() => navigate("/reader")}
-                >
-                    Поиск
-                </button>
-            </div>
+            <SearchField/>
         </div>
     );
 }

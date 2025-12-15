@@ -1,8 +1,8 @@
 import { BrowserRouter as Router, Routes, Route} from "react-router-dom";
-import Reader from "./components/Reader";
-import AuthForm from "./components/Auth";
-import HomePage from "./components/Home";
-import BooksList from "./components/BooksList";
+import Reader from "./Book/Reader";
+import AuthForm from "./Auth/Auth";
+import HomePage from "./User(Home pages)/Home";
+import BooksList from "./Book/BooksList";
 
 function App() {
     return (

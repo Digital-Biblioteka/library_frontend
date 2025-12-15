@@ -1,8 +1,8 @@
 import React from "react";
 import { useFormik } from "formik";
 import { useNavigate } from "react-router-dom";
-import { signUp, signIn } from "../api/authApi";
-import "../style/form.css";
+import { signUp, signIn } from "./authApi";
+import "./sign_form.css";
 
 const validate = (values, mode) => {
     const errors = {};

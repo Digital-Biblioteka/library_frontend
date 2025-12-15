@@ -1,12 +1,10 @@
-import "../../../style/modal-window.css"
+import "../../User(Home pages)/modal-window.css"
 import {useNavigate} from "react-router-dom";
-import {deleteBook, editBook} from "../../../api/adminBookApi";
+import {deleteBook, editBook} from "../api/adminBookApi";
 import React, {useState} from "react";
 import {useFormik} from "formik";
-import Select from "react-select";
-import {genres} from "./Genres";
-import {openBook} from "../../../api/readerApi";
-
+import {openBook} from "../../Book/api/readerApi";
+import BookForm from "../form/BookForm";
 
 export default function AdminEditorModal({ isOpen, onClose, book }) {
     const navigate = useNavigate();
@@ -30,9 +28,8 @@ export default function AdminEditorModal({ isOpen, onClose, book }) {
                     description: values.description,
                     genre: values.genre,
                     publisher: values.publisher,
-                    isbn: book.isbn
                 });
-                alert("Книга успешно обновлена!");
+
                 resetForm();
                 setMode("main");
 
@@ -58,7 +55,7 @@ export default function AdminEditorModal({ isOpen, onClose, book }) {
         let bookToOpen = await openBook(book.id)
         console.log(bookToOpen)
 
-        navigate("/reader", {state: {url: bookToOpen}})
+        navigate("/reader", {state: {url: bookToOpen, title: book.title, id: book.id}})
     }
 
     if (!isOpen || !book) return null;
@@ -93,58 +90,13 @@ export default function AdminEditorModal({ isOpen, onClose, book }) {
                 {mode === "edit" && (
                     <>
                         <form className="modal-form" onSubmit={formik.handleSubmit}>
-                            <input
-                                type="text"
-                                name="title"
-                                value={formik.values.title}
-                                onChange={formik.handleChange}
-                            />
-                            {formik.errors.title && <div className="error">{formik.errors.title}</div>}
-
-                            <input
-                                type="text"
-                                name="author"
-                                value={formik.values.author}
-                                onChange={formik.handleChange}
-                            />
-                            {formik.errors.author
-                                && <div className="error">{formik.errors.author}</div>}
-
-                            <textarea
-                                name="description"
-                                rows="3"
-                                value={formik.values.description}
-                                onChange={formik.handleChange}
-                            />
-                            {formik.errors.description
-                                && <div className="error">{formik.errors.description}</div>}
-
-                            <Select
-                                options={genres}
-                                value={genres.find((g) => g.value === formik.values.genre)}
-                                onChange={(option) => formik.setFieldValue("genre", option.value)}
-                                classNamePrefix="rs"
-                            />
-                            {formik.errors.genre && <div className="error">{formik.errors.genre}</div>}
-
-                            <input
-                                type="text"
-                                name="publisher"
-                                value={formik.values.publisher}
-                                onChange={formik.handleChange}
-                            />
-                            {formik.errors.publisher
-                                && <div className="error">{formik.errors.publisher}</div>}
-
+                            <BookForm formik={formik}/>
                             <div className="modal-buttons">
                                 <button type="submit" className="save-btn">
                                     Сохранить
                                 </button>
-                                <button
-                                    type="button"
-                                    className="cancel-btn"
-                                    onClick={() => setMode("main")}
-                                >
+                                <button type="button" className="cancel-btn"
+                                    onClick={() => setMode("main")}>
                                     Назад
                                 </button>
                             </div>

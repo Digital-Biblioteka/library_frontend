@@ -115,18 +115,20 @@
     border-radius: 8px;
     border: 1px solid #000000;
     cursor: pointer;
-    font-weight: 500;
     font-size: 16px;
-    transition: 0.2s ease;
 }
 
-.close-btn{
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
     background: none;
-    color: #000000;
     border: none;
-    border-radius: 8px;
-    cursor: pointer;
     font-size: 18px;
+    cursor: pointer;
+    color: #000000;
+    padding: 4px;
+    border-radius: 6px;
 }
 
 .close-btn:hover{
@@ -136,6 +138,11 @@
 .action-btn {
     background-color: #aaa;
     color: white;
+}
+
+.action-btn:hover {
+    background-color: gainsboro;
+    color: black;
 }
 
 .add-btn {
@@ -159,19 +166,6 @@
 .cancel-btn {
     background-color: #ccc;
     color: #333;
-}
-
-.close-btn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: none;
-    border: none;
-    font-size: 18px;
-    cursor: pointer;
-    color: #000000;
-    padding: 4px;
-    border-radius: 6px;
 }
 
 .error {

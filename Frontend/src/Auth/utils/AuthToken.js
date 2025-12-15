@@ -1,10 +1,12 @@
+import {jwtDecode} from "jwt-decode";
+
 export function TokenParser() {
     const token = localStorage.getItem("token");
 
     if(!token) return null;
 
     try {
-        const parsed = JSON.parse(atob(token.split('.')[1]));
+        const parsed = jwtDecode(token);
         return {
             username: parsed.username || "NO NAME!!!!",
             role: parsed.role

@@ -83,7 +83,7 @@
 
 .book-cover {
     width: 100%;
-    height: 240px;
+    max-height: 240px;
     object-fit: cover;
 }
 
@@ -96,4 +96,12 @@
     font-size: 13px;
     color: #444;
     margin-top: 2px;
+}
+
+.empty-result {
+    font-size: 20px;
+    color: #777;
+    text-align: center;
+    grid-column: 1 / -1; /* Чтобы занял всю ширину сетки */
+    margin-top: 20px;
 }

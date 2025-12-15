@@ -1,7 +1,7 @@
-import { getUsername, logout } from "../../utils/AuthToken";
-import "../../style/home.css";
-import "../../style/admin-home.css"
-import WorkWIthBookModal from "./admin tools/AdminPanel";
+import { getUsername, logout } from "../Auth/utils/AuthToken";
+import "../User(Home pages)/home.css";
+import "./admin-home.css"
+import WorkWIthBookModal from "./modals/AdminAddBookModal";
 import {useState} from "react";
 
 export default function HomeAdmin() {

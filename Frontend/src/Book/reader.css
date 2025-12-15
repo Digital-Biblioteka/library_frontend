@@ -1,0 +1,116 @@
+.reader-wrapper {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: #ffe1ef;
+}
+
+.reader-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 15px;
+    background: #FFB1D0;
+    height: 50px;
+}
+
+.header-left,
+.header-center,
+.header-right {
+    display: flex;
+    align-items: center;
+}
+
+.header-center {
+    flex: 1;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.back-btn {
+    margin-right: 8px;
+    font-size: 18px;
+    cursor: pointer;
+    background: none;
+    border: none;
+}
+
+/* TOC панель */
+.toc-panel {
+    position: absolute;
+    top: 60px;
+    right: 0;
+    bottom: 0;
+    width: 250px;
+    background: #fff;
+    border-left: 1px solid #ddd;
+    overflow-y: auto;
+    z-index: 100;
+    padding: 10px;
+}
+
+.toc-item {
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 3px;
+    margin-bottom: 2px;
+}
+
+.toc-item:hover {
+    background: #eee;
+}
+
+/* Основная область книги */
+.reader-main {
+    flex: 1;
+    display: flex;
+    position: relative;
+    overflow: hidden;
+}
+
+.reader-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.reader-view {
+    width: 100%;
+    height: 100%;
+    max-width: 1200px;
+    border: none;
+    background: #fff;
+    overflow: hidden;
+}
+
+/* Боковые кнопки перелистывания */
+.nav-button {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #E35B91;
+    user-select: none;
+    transition: background 0.2s;
+    z-index: 10;
+}
+
+.nav-button:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.nav-button.left {
+    left: 0;
+}
+
+.nav-button.right {
+    right: 0;
+}
