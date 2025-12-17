@@ -93,8 +93,16 @@ export default function BooksList() {
 
             <AdminEditorModal
                 isOpen={isAdminModalOpen}
-                onClose={() => setAdminIsModalOpen()}
+                onClose={() => setAdminIsModalOpen(false)}
                 book={selectedBook}
+                onBookUpdated={(updatedBook) => {
+                    setBooks(prev =>
+                        prev.map(b => b.id === updatedBook.id ? updatedBook : b)
+                    );
+                }}
+                onBookDeleted={(id) => {
+                    setBooks(prev => prev.filter(b => b.id !== id));
+                }}
             />
 
             <UserBookModal

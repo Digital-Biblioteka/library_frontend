@@ -72,3 +72,13 @@
     background: #FFB1D0;
     color: white;
 }
+
+.hint-text {
+    cursor: pointer;
+    color: #561b81;
+    font-size: 16px;
+}
+
+.hint-text:hover {
+    color: #a778cc;
+}

@@ -1,31 +1,64 @@
-import React, {useState} from "react";
+import React, { useEffect, useState } from "react";
 import "./modal-window.css";
-import {useNavigate} from "react-router-dom";
-import {openBook} from "../Book/api/readerApi";
-import {addBookToList} from "../Book/api/readlaterApi";
+import { useNavigate } from "react-router-dom";
+import { openBook } from "../Book/api/readerApi";
+import { addBookToList, deleteReadLaterBook, getReadLaterList } from "../Book/api/readlaterApi";
 
 export default function UserBookModal({ isOpen, onClose, book, id }) {
     const navigate = useNavigate();
     const token = localStorage.getItem("token");
 
-    if (!isOpen || !book) return null;
+    const [liked, setLiked] = useState(false);
+    const [loading, setLoading] = useState(false);
+
+    // Проверяем, есть ли книга в списке "читать позже"
+    useEffect(() => {
+        if (!isOpen || !token || !id) return;
+
+        getReadLaterList()
+            .then(list => {
+                setLiked(list.some(b => b.bookId === id));
+            })
+            .catch(console.error);
+    }, [id, isOpen, token]);
+
 
     const handleOpenBook = async () => {
-        let bookToOpen = await openBook(id)
-        console.log(bookToOpen)
+        try {
+            const bookUrl = await openBook(id);
+            navigate("/reader", { state: { url: bookUrl, title: book.title, id } });
+        } catch (e) {
+            console.error("Ошибка открытия книги:", e);
+        }
+    };
 
-        navigate("/reader", {state: {url: bookToOpen, title: book.title, id: id}})
-    }
+    const toggleLike = async () => {
+        if (!token || loading) return;
+        setLoading(true);
+        const newLiked = !liked;
+        setLiked(newLiked);
 
-    const handleReadLaterBook = async () => {
-        await addBookToList(id)
-    }
+        try {
+            if (newLiked) {
+                await addBookToList(id);
+            } else {
+                await deleteReadLaterBook(id);
+                onClose()
+                window.location.reload()
+            }
+        } catch (e) {
+            console.error("Ошибка при изменении лайка:", e);
+            setLiked(!newLiked); // откатываем при ошибке
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (!isOpen || !book) return null;
 
     return (
         <div className="modal-overlay" onClick={onClose}>
-            <div
-                className="modal-window"
-                onClick={(e) => e.stopPropagation()}>
+            <div className="modal-window" onClick={e => e.stopPropagation()}>
                 <div className="modal-header">
                     <h2>{book.title}</h2>
                     <button className="close-btn" onClick={onClose}>X</button>
@@ -36,12 +69,15 @@ export default function UserBookModal({ isOpen, onClose, book, id }) {
                     <p><b>Описание:</b> {book.description}</p>
                 </div>
                 <div className="modal-buttons">
-                    <button className="add-btn" onClick={handleOpenBook}>
-                        Читать
-                    </button>
+                    <button className="add-btn" onClick={handleOpenBook}>Читать</button>
                     {token && (
-                        <button className="action-btn" onClick={handleReadLaterBook}>
-                            Читать позже
+                        <button
+                            className={`heart-btn ${liked ? "liked" : ""}`}
+                            onClick={toggleLike}
+                            disabled={loading}
+                            title={liked ? "Убрать из читать позже" : "Добавить в читать позже"}
+                        >
+                            {liked ? "❤️" : "🤍"}
                         </button>
                     )}
                 </div>

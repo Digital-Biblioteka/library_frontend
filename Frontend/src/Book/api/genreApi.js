@@ -31,3 +31,35 @@ export async function addGenre(genreName) {
 
     return await res.json()
 }
+
+export async function editGenre(id, newGenre) {
+    const res = await fetch(`http://localhost:8080/api/admin/genres/${id}`, {
+        method: "PUT",
+        headers: {
+            "Authorization": `Bearer ${localStorage.getItem("token")}`,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({genreName: newGenre }),
+    });
+
+    if (!res.ok) {
+        const msg = await res.text();
+        console.error(`Не удалось отредактировать жанр: ${msg}`)
+    }
+}
+
+export async function deleteGenre(id) {
+    const res = await fetch( `http://localhost:8080/api/admin/genres/${id}`, {
+        method: "DELETE",
+        headers: {
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        }
+    });
+
+    if (!res.ok) {
+        const msg = await res.text();
+        console.error(`Не удалось удалить жанр: ${msg}`)
+    }
+}
+
+

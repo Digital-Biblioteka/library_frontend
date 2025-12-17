@@ -6,7 +6,7 @@ import {useFormik} from "formik";
 import {openBook} from "../../Book/api/readerApi";
 import BookForm from "../form/BookForm";
 
-export default function AdminEditorModal({ isOpen, onClose, book }) {
+export default function AdminEditorModal({ isOpen, onClose, book, onBookUpdated, onBookDeleted }) {
     const navigate = useNavigate();
     const [mode, setMode] = useState("main");
 
@@ -30,11 +30,15 @@ export default function AdminEditorModal({ isOpen, onClose, book }) {
                     publisher: values.publisher,
                 });
 
+                onBookUpdated?.({
+                    ...book,
+                    ...values,
+                });
+
                 resetForm();
                 setMode("main");
-
                 onClose?.();
-                window.location.reload();
+
             } catch (err) {
                 alert(err.message);
                 console.log(err.message)
@@ -45,8 +49,8 @@ export default function AdminEditorModal({ isOpen, onClose, book }) {
     const handleDeleteBook = () => {
         deleteBook(book.id)
             .then(() => {
+                onBookDeleted?.(book.id);
                 onClose();
-                window.location.reload();
             })
             .catch(err => console.error("Ошибка удаления книги:", err))
     }

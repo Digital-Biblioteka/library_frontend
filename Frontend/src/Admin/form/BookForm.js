@@ -1,14 +1,6 @@
-import Select from "react-select";
-import {useEffect, useState} from "react";
-import {Genres, NoOptionsMessage} from "../../Book/Genres";
-
+import GenreSelect from "../../Book/Genres";
 
 export default function BookForm({ formik }) {
-    const [genres, setGenres] = useState([]);
-
-    useEffect(() => {
-        Genres().then(setGenres);
-    }, []);
 
     return (
         <>
@@ -45,21 +37,8 @@ export default function BookForm({ formik }) {
                 <div className="error">{formik.errors.description}</div>
             )}
 
-            <Select
-                options={genres}
-                placeholder="Жанр"
-                value={genres.find(g => g.value === formik.values.genre)}
-                onChange={(option) =>
-                    formik.setFieldValue("genre", option.value)
-                }
-                classNamePrefix="rs"
-                noOptionsMessage={({ inputValue }) => (
-                    <NoOptionsMessage
-                        selectProps={{ setGenres, formik }}
-                        inputValue={inputValue}
-                    />
-                )}
-            />
+            {/* Выбираем жанр через наш компонент */}
+            <GenreSelect formik={formik} />
             {formik.errors.genre && (
                 <div className="error">{formik.errors.genre}</div>
             )}

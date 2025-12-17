@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import ePub from "epubjs"
 import {useLocation, useNavigate} from "react-router-dom";
 import "./reader.css"
-import {getLastReadingPos, postReadingPos} from "./api/readerApi";
+import {getLastReadingPos, getToc, postReadingPos} from "./api/readerApi";
 
 const TocItem = ({ item, goToCfi, level = 0 }) => {
     return (
@@ -10,13 +10,13 @@ const TocItem = ({ item, goToCfi, level = 0 }) => {
             <div
                 className="toc-item"
                 style={{ paddingLeft: `${level * 15}px` }}
-                onClick={() => goToCfi(item.href)}
+                onClick={() => goToCfi(item.htmlHref)}
             >
-                {item.label}
+                {item.title}
             </div>
-            {item.subitems &&
-                item.subitems.map((sub, idx) => (
-                    <TocItem key={idx} item={sub} goToCfi={goToCfi} level={level + 1} />
+            {item.children &&
+                item.children.map((sub, id) => (
+                    <TocItem key={id} item={sub} goToCfi={goToCfi} level={level + 1} />
                 ))}
         </div>
     );
@@ -43,8 +43,7 @@ const Reader = () => {
     const savePosition = () => {
         if (!id || !lastCfiRef.current) return;
         void postReadingPos(id, lastCfiRef.current);
-    };
-
+     };
 
     useEffect(() => {
         if (!url || !id) return;
@@ -60,24 +59,24 @@ const Reader = () => {
                 if (cancelled) return;
 
                 const rendition = book.renderTo(viewerRef.current, {
-                    width: "100%",
-                    height: "100%",
-                    flow: "paginated",
-                    spread: "always",
-                    minSpreadWidth: 700
-                });
+                     width: "100%",
+                     height: "100%",
+                     flow: "paginated",
+                     spread: "always",
+                     minSpreadWidth: 700
+                 });
 
-                renditionRef.current = rendition;
+                 renditionRef.current = rendition;
 
-                const nav = await book.loaded.navigation;
-                if (cancelled) return;
+                 if (cancelled) return;
 
-                const tocData = nav.toc || [];
+                const tocData = await getToc(id) || [];
                 setToc(tocData);
+                console.log(tocData)
 
                 const savedPos = await getLastReadingPos(id);
 
-                let startCfi = tocData[0]?.href;
+                let startCfi = tocData[0]?.htmlHref;
 
                 if (savedPos?.position) {
                     try {
@@ -145,8 +144,8 @@ const Reader = () => {
 
             {tocVis && (
                 <div className="toc-panel">
-                    {toc.map((item, i) => (
-                        <TocItem key={i} item={item} goToCfi={goToCfi} />
+                    {toc.map((item, id) => (
+                        <TocItem key={id} item={item} goToCfi={goToCfi} />
                     ))}
                 </div>
             )}

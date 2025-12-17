@@ -3,10 +3,12 @@ import "../User(Home pages)/home.css";
 import "./admin-home.css"
 import WorkWIthBookModal from "./modals/AdminAddBookModal";
 import {useState} from "react";
+import WorkWithUsersModal from "./modals/AdminUsersModal";
 
 export default function HomeAdmin() {
     const username = getUsername();
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isBookModalOpen, setIsBookModalOpen] = useState(false);
+    const [isUserModalOpen, setIsUserModalOpen] = useState(false)
 
     return (
         <div className="Home">
@@ -26,14 +28,23 @@ export default function HomeAdmin() {
 
                 <div className="admin-panel">
                     <button className="admin-button"
-                        onClick={() => setIsModalOpen(true)}>
-                        Управление книгами</button>
-                    <button className="admin-button">Управление пользователями</button>
+                        onClick={() => setIsBookModalOpen(true)}>
+                        Управление книгами
+                    </button>
+                    <button className="admin-button"
+                            onClick={() => setIsUserModalOpen(true)}>
+                        Управление пользователями
+                    </button>
                 </div>
 
                 <WorkWIthBookModal
-                    isOpen={isModalOpen}
-                    onClose={() => setIsModalOpen(false)}
+                    isOpen={isBookModalOpen}
+                    onClose={() => setIsBookModalOpen(false)}
+                />
+
+                <WorkWithUsersModal
+                    isOpen={isUserModalOpen}
+                    onClose={() => setIsUserModalOpen(false)}
                 />
             </div>
         </div>
