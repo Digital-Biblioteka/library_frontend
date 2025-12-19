@@ -76,6 +76,8 @@ export async function getToc(bookId) {
 }
 
 export async function getChapByToc(bookId, toc) {
+    console.log("TOC SENT:", toc);
+
     const res = await fetch (`${API_BASE}/${bookId}/toc/chapter`, {
         method: "POST",
         headers: {
@@ -101,6 +103,8 @@ export async function getChapByToc(bookId, toc) {
 }
 
 export async function getChapByIdx(bookId, spineIdx) {
+    console.log(spineIdx)
+
     const res = await fetch (`${API_BASE}/${bookId}/chapter/${spineIdx}`, {
         method: "GET",
         headers: {
