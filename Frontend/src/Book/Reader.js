@@ -1,129 +1,117 @@
 import React, { useEffect, useRef, useState } from "react";
-import ePub from "epubjs"
 import {useLocation, useNavigate} from "react-router-dom";
 import "./reader.css"
-import {getLastReadingPos, postReadingPos} from "./api/readerApi";
+import {getLastReadingPos, getToc, postReadingPos, getChapByToc, getChapByIdx} from "./api/readerApi";
 
-const TocItem = ({ item, goToCfi, level = 0 }) => {
+const TocItem = ({ item, goToItem, level = 0 }) => {
     return (
         <div>
             <div
                 className="toc-item"
                 style={{ paddingLeft: `${level * 15}px` }}
-                onClick={() => goToCfi(item.href)}
+                onClick={() => goToItem(item)}
             >
-                {item.label}
+                {item.title}
             </div>
-            {item.subitems &&
-                item.subitems.map((sub, idx) => (
-                    <TocItem key={idx} item={sub} goToCfi={goToCfi} level={level + 1} />
+            {item.children &&
+                item.children.map((sub, id) => (
+                    <TocItem key={id} item={sub} goToItem={goToItem} level={level + 1} />
                 ))}
         </div>
     );
 };
 
 const Reader = () => {
-    const viewerRef = useRef(null);
-    const renditionRef = useRef(null);
-    const bookRef = useRef(null);
+    const containerRef = useRef(null);
 
-    const lastCfiRef = useRef(null);
-    const saveIntervalRef = useRef(null);
+    const spineRef = useRef(0);
+    const saveTimerRef = useRef(null);
+
 
     const { state } = useLocation();
-    const url = state?.url;
+    //const url = state?.url;
     const title = state?.title || "Без названия";
     const id = state?.id;
 
     const navigate = useNavigate();
 
-    const [tocVis, setTocVis] = useState(false);
+    const [html, setHtml] = useState("");
     const [toc, setToc] = useState([]);
+    const [tocVis, setTocVis] = useState(false);
 
-    const savePosition = () => {
-        if (!id || !lastCfiRef.current) return;
-        void postReadingPos(id, lastCfiRef.current);
-    };
+    const [spineIdx, setSpineIdx] = useState(0);
+    const [hasNext, setHasNext] = useState(false);
+    const [hasPrev, setHasPrev] = useState(false);
 
+    const loadChapter = async (loader) => {
+        const chapter = await loader();
+        console.log(chapter)
+        setHtml(chapter.html);
+        setSpineIdx(chapter.spineIdx);
+        setHasNext(chapter.hasNext);
+        setHasPrev(chapter.hasPrev);
 
-    useEffect(() => {
-        if (!url || !id) return;
+        spineRef.current = chapter.spineIdx;
 
-        let cancelled = false;
-
-        const book = ePub(url);
-        bookRef.current = book;
-
-        (async () => {
-            try {
-                await book.ready;
-                if (cancelled) return;
-
-                const rendition = book.renderTo(viewerRef.current, {
-                    width: "100%",
-                    height: "100%",
-                    flow: "paginated",
-                    spread: "always",
-                    minSpreadWidth: 700
-                });
-
-                renditionRef.current = rendition;
-
-                const nav = await book.loaded.navigation;
-                if (cancelled) return;
-
-                const tocData = nav.toc || [];
-                setToc(tocData);
-
-                const savedPos = await getLastReadingPos(id);
-
-                let startCfi = tocData[0]?.href;
-
-                if (savedPos?.position) {
-                    try {
-                        startCfi = JSON.parse(savedPos.position);
-                    } catch {
-                        startCfi = savedPos.position;
-                    }
-                }
-
-                await rendition.display(startCfi);
-
-                rendition.on("relocated", (loc) => {
-                    lastCfiRef.current = loc.start.cfi;
-                });
-
-                saveIntervalRef.current = setInterval(() => {
-                    savePosition();
-                }, 15000);
-
-            } catch (err) {
-                console.error("EPUB load error:", err);
-            }
-        })();
-
-        return () => {
-            cancelled = true;
-            clearInterval(saveIntervalRef.current)
-            try {
-                savePosition();
-                renditionRef.current?.destroy();
-            } catch {}
-        };
-// eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [url, id]);
-
-
-    const next = () => renditionRef.current?.next();
-    const prev = () => renditionRef.current?.prev();
-
-    const goToCfi = (cfi) => {
-        renditionRef.current?.display(cfi);
-        setTocVis(false);
+        requestAnimationFrame(() => {
+            containerRef.current?.scrollTo({ top: 0 });
+        });
     }
 
+    const saveReadingPos = async () => {
+        if (!id) return;
+
+        try {
+            await postReadingPos(id, {
+                spineIdx: spineRef.current
+            });
+        } catch (e) {
+            console.error("Ошибка сохранения позиции", e);
+        }
+    };
+
+    useEffect(() => {
+        if (!id) return;
+
+        saveTimerRef.current = setInterval(() => {
+            void saveReadingPos();
+        }, 30_000);
+
+        (async () => {
+            const tocData = await getToc(id);
+            setToc(tocData);
+
+            const lastPos = await getLastReadingPos(id);
+
+            const startSpine =
+                lastPos?.spineIdx !== undefined
+                    ? lastPos.spineIdx
+                    : 0; //при 0 ошибка
+
+            await loadChapter(() => getChapByIdx(id, startSpine));
+        })();
+
+        return () => clearInterval(saveTimerRef.current);
+    }, [id]);
+
+
+    const next = () => {
+        if (!hasNext) return;
+        void loadChapter(() => getChapByIdx(id, spineIdx + 1));
+    };
+
+    const prev = () => {
+        if (!hasPrev) return;
+        void loadChapter(() => getChapByIdx(id, spineIdx - 1));
+    };
+
+    const goToTocItem = (item) => {
+        setTocVis(false);
+        void loadChapter(() => getChapByToc(id, item));
+    };
+
     const handleExit = () => {
-        savePosition();
+        void saveReadingPos();
         navigate(-1);
     };
 
@@ -145,16 +133,19 @@ const Reader = () => {
 
             {tocVis && (
                 <div className="toc-panel">
-                    {toc.map((item, i) => (
-                        <TocItem key={i} item={item} goToCfi={goToCfi} />
+                    {toc.map((item, id) => (
+                        <TocItem key={id} item={item} goToItem={goToTocItem} />
                     ))}
                 </div>
             )}
             <div className="reader-main">
                 <div className="nav-button left" onClick={prev}>&lt;</div>
 
-                <div className="reader-container">
-                    <div ref={viewerRef} className="reader-view" />
+                <div className="chapter" ref={containerRef}>
+                    <article
+                        className="chapter-html"
+                        dangerouslySetInnerHTML={{ __html: html }}
+                    />
                 </div>
 
                 <div className="nav-button right" onClick={next}>&gt;</div>

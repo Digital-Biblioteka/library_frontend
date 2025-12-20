@@ -173,3 +173,36 @@
     font-size: 13px;
     text-align: left;
 }
+
+.users-layout {
+    display: flex;
+    gap: 16px;
+}
+
+.users-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.users-table th, .users-table td {
+    padding: 8px;
+    border-bottom: 1px solid #ddd;
+}
+
+.users-table button {
+    margin-right: 6px;
+    cursor: pointer;
+}
+
+.like-btn {
+    font-size: 1.5rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.like-btn:active {
+    transform: scale(1.2);
+}
+

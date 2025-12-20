@@ -28,8 +28,7 @@ export async function getBookPreview(id) {
     return res.text()
 }
 
-export async function postReadingPos(id, position){
-    console.log(position)
+export async function postReadingPos(id, position) {
 
     const res = await fetch(`${API_BASE}/${id}/pos`, {
         method: "POST",
@@ -59,7 +58,70 @@ export async function getLastReadingPos(id) {
         return null
     }
 
-    //console.log(res.text())
-
     return await res.json()
+}
+
+export async function getToc(bookId) {
+    const res = await fetch(`${API_BASE}/${bookId}/toc`, {
+        method: "GET"
+    });
+
+    if(!res.ok) {
+        const msg = await res.text();
+        console.error(`Ошибка получения оглавления: ${msg}`);
+    }
+
+    //console.log(await res.json())
+    return await res.json()
+}
+
+export async function getChapByToc(bookId, toc) {
+    console.log("TOC SENT:", toc);
+
+    const res = await fetch (`${API_BASE}/${bookId}/toc/chapter`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+
+        },
+        body: JSON.stringify(toc)
+    })
+
+    if(!res.ok) {
+        const msg = await res.text()
+        console.error(`Ошибка получения главы: ${msg}`);
+    }
+
+    return {
+        html: await res.text(),
+        spineIdx: Number(res.headers.get("X-Spine-Index")),
+        total: Number(res.headers.get("X-Total-Spines")),
+        hasNext: res.headers.get("X-Has-Next") === "true",
+        hasPrev: res.headers.get("X-Has-Prev") === "true",
+    };
+}
+
+export async function getChapByIdx(bookId, spineIdx) {
+    console.log(spineIdx)
+
+    const res = await fetch (`${API_BASE}/${bookId}/chapter/${spineIdx}`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json"
+        }
+    })
+
+    if(!res.ok) {
+        const msg = await res.text()
+        throw new Error(`Ошибка получения главы: ${msg}`);
+    }
+
+    return {
+        html: await res.text(),
+        spineIdx: Number(res.headers.get("X-Spine-Index")),
+        total: Number(res.headers.get("X-Total-Spines")),
+        hasNext: res.headers.get("X-Has-Next") === "true",
+        hasPrev: res.headers.get("X-Has-Prev") === "true",
+    };
 }

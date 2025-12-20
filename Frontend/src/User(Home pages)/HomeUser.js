@@ -3,7 +3,7 @@ import "./home.css";
 import "./user-home.css"
 import {getUsername, logout} from "../Auth/utils/AuthToken";
 import SearchField from "../Book/SearchField";
-import {deleteReadLaterBook, getReadLaterList} from "../Book/api/readlaterApi";
+import {getReadLaterList} from "../Book/api/readlaterApi";
 import UserBookModal from "./UserBookModal";
 import BookCard from "../Book/BookCard";
 import {deleteLastReadBook, getLastReadList} from "../Book/api/lastReadApi";
@@ -41,12 +41,6 @@ function HomeUser() {
             deleteLastReadBook(bookId)
                 .then(() => window.location.reload())
                 .catch(err => console.error("Ошибка удаления книги:", err));
-        }
-        if (activeTab === "want") {
-            deleteReadLaterBook(bookId)
-                .then(() =>
-                window.location.reload())
-                .catch(err => console.error("Ошибка удаления книги:", err))
         }
     }
 
@@ -101,13 +95,6 @@ function HomeUser() {
                                                 book = {book.book}
                                                 onClick = {() => handleBookClick(book)}
                                             />
-                                            <button className="close-btn"
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        handleDeleteFromList(book.bookId);
-                                                    }}>
-                                                🗑
-                                            </button>
                                         </div>
                                     ))}
                                 </div>

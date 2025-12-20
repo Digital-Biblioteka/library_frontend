@@ -30,7 +30,6 @@ export async function deleteBook(id) {
 }
 
 export async function editBook(id, book) {
-    console.log(JSON.stringify(book))
     const res = await fetch(`${API_BASE}/${id}`, {
         method: "PUT",
         headers: {

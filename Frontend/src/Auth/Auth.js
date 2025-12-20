@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import { useFormik } from "formik";
 import { useNavigate } from "react-router-dom";
 import { signUp, signIn } from "./authApi";
@@ -28,6 +28,8 @@ const validate = (values, mode) => {
 
 function AuthForm({ mode = "signin" }) {
     const navigate = useNavigate();
+    const [serverError, setServerError] = useState(null);
+
     const formik = useFormik({
         initialValues: {
             Username: "",
@@ -57,11 +59,21 @@ function AuthForm({ mode = "signin" }) {
                 console.log("Успешно ура!!")
                 navigate("/");
             } catch (err) {
-                alert(err.message);
                 console.log(err.message)
+                const msg = err.message?.toLowerCase() || "";
+
+                if (mode === "signup" && msg.includes("уже существует")) setServerError("USER_EXISTS");
+
+                if (mode === "signin" && msg.includes("bad credentials")) setServerError("WRONG");
             }
         },
     });
+
+
+    const handleClearForm = () => {
+        formik.resetForm();
+        setServerError(null);
+    };
 
     return (
         <div className="Page">
@@ -117,6 +129,24 @@ function AuthForm({ mode = "signin" }) {
                         Submit
                     </button>
                 </form>
+
+                {serverError === "USER_EXISTS" && (
+                    <div className="hint-text" onClick={() => navigate("/sign-in")}>
+                        Аккаунт уже существует? <span>Войти</span>
+                    </div>
+                )}
+
+                {serverError === "WRONG" && (
+                    <div className="hint-text" onClick={handleClearForm}>
+                        Неверный пароль/email. <span>Попробовать снова</span>
+                    </div>
+                )}
+
+                {mode === "signin" && !serverError && (
+                    <div className="hint-text" onClick={() => navigate("/sign-up")}>
+                        Нет аккаунта? <span>Зарегистрироваться</span>
+                    </div>
+                )}
             </div>
         </div>
     );
