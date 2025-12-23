@@ -83,7 +83,6 @@
     margin: 0 auto;
     padding-bottom: 40px;
     font-family: "Literata", Georgia, "Times New Roman", serif;
-    font-size: 20px;
     line-height: 1.7;
     color: #222;
 }
@@ -137,11 +136,26 @@
     border: none;
     border-radius: 50%;
     color: white;
-    font-size: 16px;
+    font-size: 20px;
     line-height: 20px;
     text-align: center;
     cursor: pointer;
     z-index: 10;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.block-wrapper:hover .bookmark-btn-block {
+    opacity: 1;
+}
+
+.bookmark-btn-block.active {
+    opacity: 1;          /* ⭐ всегда видно */
+}
+
+.bookmark-btn-block span {
+    font-size: 12px;
+    white-space: nowrap;
 }
 
 .nav-button {
@@ -185,4 +199,35 @@
     height: 100%;
     background: #E35B91;
     transition: width 0.15s linear;
+}
+
+.font-btn {
+    background: none;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+}
+
+.font-btn:hover {
+    color: #E35B91;
+}
+
+.theme-btn {
+    background: none;
+    cursor: pointer;
+    font-size: 28px;
+    border: none;
+}
+
+.theme-light {
+    color: #111;
+}
+
+.theme-dark {
+    background: #545152;
+}
+
+.theme-dark .chapter-html {
+    color: #e0c0cd;
 }

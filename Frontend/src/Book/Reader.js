@@ -45,6 +45,18 @@ const Reader = () => {
 
     const { bookmarks, add: addBookmark, remove: deleteBookmark, update: editBookmark } = useBookmarks(id);
 
+    const [fontSize, setFontSize] = useState(Number(localStorage.getItem("reader-font")) || 18);
+    useEffect(() => {
+        localStorage.setItem("reader-font", fontSize);
+    }, [fontSize]);
+
+    const [theme, setTheme] = useState(
+        localStorage.getItem("reader-theme") || "light"
+    );
+    useEffect(() => {
+        localStorage.setItem("reader-theme", theme);
+    }, [theme]);
+
     useEffect(() => {
         if (!containerRef.current) return;
 
@@ -64,30 +76,39 @@ const Reader = () => {
             let btn = block.querySelector(".bookmark-btn-block");
             if (!btn) {
                 btn = document.createElement("button");
-                btn.innerText = exists? "🏴": "⚐";
                 btn.className = "bookmark-btn-block";
-
                 block.appendChild(btn);
-
-                btn.addEventListener("click", () => {
-                    if (exists) {
-                        deleteBookmark (exists.id);
-                    } else {
-                        addBookmark({
-                            spineRef: spineIdx,
-                            paragraphIdx: idx,
-                            text: ""
-                        });
-                        setBmVis(true);
-                    }
-                });
             }
+
+            if (exists) {
+                btn.innerHTML = "★";
+                btn.classList.add("active");
+            } else {
+                btn.innerHTML = "☆";
+                btn.classList.remove("active");
+            }
+
+            btn.onclick = (e) => {
+                e.stopPropagation();
+
+                if (exists) {
+                    deleteBookmark(exists.id);
+                } else {
+                    addBookmark({
+                        spineRef: spineIdx,
+                        paragraphIdx: idx,
+                        text: ""
+                    });
+                    setBmVis(true);
+                }
+            };
+
         });
     }, [html, spineIdx, addBookmark]);
 
     useEffect(() => {
         const global =
-            spineIdx / total;
+            spineIdx / (total-1);
         setProgress(global);
     }, [spineIdx, total, html]);
 
@@ -176,10 +197,14 @@ const Reader = () => {
     const handleExit = () => { void saveReadingPos(); navigate(-1); };
 
     return (
-        <div className="reader-wrapper">
+        <div className="reader-wrapper ">
             <div className="reader-header">
                 <div className="header-left">
                     <button className="back-btn" onClick={handleExit}>←</button>
+                    <button className="font-btn" onClick={() => setFontSize(f => Math.max(14, f - 2))}>A−</button>
+                    <button className="font-btn" onClick={() => setFontSize(f => Math.min(28, f + 2))}>A+</button>
+                    <button className="theme-btn" onClick={() => setTheme("light")}>☼</button>
+                    <button className="theme-btn" onClick={() => setTheme("dark")}>☽</button>
                     <button className="close-btn" onClick={() => setTocVis(v => !v)}>☰</button>
                     <button className="bookmark-btn" onClick={() => setBmVis(v => !v)}>⚐</button>
                 </div>
@@ -211,8 +236,10 @@ const Reader = () => {
 
             <div className="reader-main">
                 <div className="nav-button left" onClick={prev}>&lt;</div>
-                <div className="chapter" ref={containerRef}>
-                    <article className="chapter-html" dangerouslySetInnerHTML={{ __html: html }} />
+                <div className={`chapter theme-${theme}`} ref={containerRef}>
+                    <article className="chapter-html"
+                             style={{ fontSize: `${fontSize}px` }}
+                             dangerouslySetInnerHTML={{ __html: html }} />
                 </div>
                 <div className="nav-button right" onClick={next}>&gt;</div>
             </div>
