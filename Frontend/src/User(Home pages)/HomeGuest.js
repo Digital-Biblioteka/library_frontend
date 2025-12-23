@@ -22,8 +22,10 @@ function HomeGuest() {
                 </div>
             </div>
 
-            <label className="label"> Cупер мега крутая онлайн библиотека класс вау 💯</label>
-            <SearchField/>
+            <div className="home-center">
+                <label className="label"> Cупер мега крутая онлайн библиотека класс вау 💯</label>
+                <SearchField/>
+            </div>
         </div>
     );
 }

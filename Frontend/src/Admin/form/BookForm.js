@@ -3,7 +3,7 @@ import GenreSelect from "../../Book/Genres";
 export default function BookForm({ formik }) {
 
     return (
-        <>
+        <div className="book-form">
             <input
                 type="text"
                 name="title"
@@ -53,6 +53,6 @@ export default function BookForm({ formik }) {
             {formik.errors.publisher && (
                 <div className="error">{formik.errors.publisher}</div>
             )}
-        </>
+        </div>
     );
 }

@@ -22,14 +22,11 @@
 }
 
 .user-tabs {
-    position: sticky;
-    top: 60px;
     width: 100%;
     display: flex;
     background: rgba(255, 255, 255, 0.8);
     backdrop-filter: blur(8px);
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-    z-index: 500;
 }
 
 .tab {
@@ -57,8 +54,7 @@
 }
 
 .book-list {
-    margin-top: 20px;
-    padding: 80px 20px 100px; /* отступы сверху и снизу */
+    padding: 20px 20px 20px; /* отступы сверху и снизу */
     gap: 16px;
     width: 100%;
     box-sizing: border-box;
@@ -77,9 +73,36 @@
     display: flex;
     flex-wrap: wrap;
     gap: 20px;
-
     justify-content: flex-start;
     align-content: flex-start;  /* чтобы не прыгало */
+}
+
+.reviews-list-grid {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+}
+
+.review-with-book {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+}
+
+.book-card-small {
+    width: 110px;   /* ⬅ реальный размер */
+    height: 180px;
+    overflow: hidden;
+}
+
+.book-card-small > * {
+    transform: scale(0.5);
+    transform-origin: top left;
+}
+
+.book-card-small:hover {
+    transform: scale(1);
 }
 
 .book-card-wr {

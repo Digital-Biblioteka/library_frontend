@@ -3,6 +3,7 @@ import "./modal-window.css";
 import { useNavigate } from "react-router-dom";
 import { openBook } from "../Book/api/readerApi";
 import { addBookToList, deleteReadLaterBook, getReadLaterList } from "../Book/api/readlaterApi";
+import ReviewsModal from "../Book/ReviewModal";
 
 export default function UserBookModal({ isOpen, onClose, book, id }) {
     const navigate = useNavigate();
@@ -10,8 +11,8 @@ export default function UserBookModal({ isOpen, onClose, book, id }) {
 
     const [liked, setLiked] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [reviewsOpen, setReviewsOpen] = useState(false);
 
-    // Проверяем, есть ли книга в списке "читать позже"
     useEffect(() => {
         if (!isOpen || !token || !id) return;
 
@@ -22,11 +23,12 @@ export default function UserBookModal({ isOpen, onClose, book, id }) {
             .catch(console.error);
     }, [id, isOpen, token]);
 
-
     const handleOpenBook = async () => {
         try {
-            const bookUrl = await openBook(id);
-            navigate("/reader", { state: { url: bookUrl, title: book.title, id } });
+            if (token) {
+                await openBook(id);
+            }
+            navigate("/reader", { state: { title: book.title, id } });
         } catch (e) {
             console.error("Ошибка открытия книги:", e);
         }
@@ -54,6 +56,7 @@ export default function UserBookModal({ isOpen, onClose, book, id }) {
         }
     };
 
+
     if (!isOpen || !book) return null;
 
     return (
@@ -70,6 +73,7 @@ export default function UserBookModal({ isOpen, onClose, book, id }) {
                 </div>
                 <div className="modal-buttons">
                     <button className="add-btn" onClick={handleOpenBook}>Читать</button>
+                    <button className="action-btn" onClick={() => setReviewsOpen(true)}>Отзывы</button>
                     {token && (
                         <button
                             className={`heart-btn ${liked ? "liked" : ""}`}
@@ -81,6 +85,11 @@ export default function UserBookModal({ isOpen, onClose, book, id }) {
                         </button>
                     )}
                 </div>
+                <ReviewsModal
+                    bookId={id}
+                    isOpen={reviewsOpen}
+                    onClose={() => setReviewsOpen(false)}
+                />
             </div>
         </div>
     );

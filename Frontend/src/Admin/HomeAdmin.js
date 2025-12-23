@@ -24,9 +24,8 @@ export default function HomeAdmin() {
                     </div>
                 </div>
 
-                <label className="label">Панель администратора</label>
-
                 <div className="admin-panel">
+                    <label className="label">Панель администратора</label>
                     <button className="admin-button"
                         onClick={() => setIsBookModalOpen(true)}>
                         Управление книгами

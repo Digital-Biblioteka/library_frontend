@@ -17,6 +17,7 @@ export async function getAllUsers () {
 }
 
 export async function createUser (userData) {
+    console.log(userData)
     const res = await fetch(`${API_BASE}`, {
         method: "POST",
         headers: {
@@ -37,7 +38,8 @@ export async function deleteUser(id) {
     const res = await fetch(`${API_BASE}/${id}`, {
         method: "DELETE",
         headers: {
-            "Authorization": `Bearer ${localStorage.getItem("token")}`
+            "Authorization": `Bearer ${localStorage.getItem("token")}`,
+            "Content-Type": "application/json"
         },
     });
 

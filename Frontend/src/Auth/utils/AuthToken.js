@@ -9,7 +9,8 @@ export function TokenParser() {
         const parsed = jwtDecode(token);
         return {
             username: parsed.username || "NO NAME!!!!",
-            role: parsed.role
+            role: parsed.role,
+            email: parsed.email
         }
     } catch (e) {
         console.log(e.message)
@@ -25,6 +26,11 @@ export function getUsername() {
 export function getRole() {
     const parser = TokenParser();
     return parser?.role || "";
+}
+
+export function getEmail() {
+    const parser = TokenParser();
+    return parser?.email || "";
 }
 
 export function logout() {

@@ -1,70 +1,115 @@
 import React, { useEffect, useRef, useState } from "react";
-import {useLocation, useNavigate} from "react-router-dom";
-import "./reader.css"
-import {getLastReadingPos, getToc, postReadingPos, getChapByToc, getChapByIdx} from "./api/readerApi";
+import { useLocation, useNavigate } from "react-router-dom";
+import "./reader.css";
+import "./bookmark.css";
+import { getLastReadingPos, getToc, postReadingPos, getChapByToc, getChapByIdx } from "./api/readerApi";
+import { useBookmarks, BookmarksPanel } from "./Bookmark";
 
-const TocItem = ({ item, goToItem, level = 0 }) => {
-    return (
-        <div>
-            <div
-                className="toc-item"
-                style={{ paddingLeft: `${level * 15}px` }}
-                onClick={() => goToItem(item)}
-            >
-                {item.title}
-            </div>
-            {item.children &&
-                item.children.map((sub, id) => (
-                    <TocItem key={id} item={sub} goToItem={goToItem} level={level + 1} />
-                ))}
+const TocItem = ({ item, goToItem, level = 0 }) => (
+    <div>
+        <div
+            className="toc-item"
+            style={{ paddingLeft: `${level * 15}px` }}
+            onClick={() => goToItem(item)}
+        >
+            {item.title}
         </div>
-    );
-};
+        {item.children?.map((sub, id) => (
+            <TocItem key={id} item={sub} goToItem={goToItem} level={level + 1} />
+        ))}
+    </div>
+);
 
 const Reader = () => {
     const containerRef = useRef(null);
-
     const spineRef = useRef(0);
     const saveTimerRef = useRef(null);
 
-
     const { state } = useLocation();
-    //const url = state?.url;
+    const navigate = useNavigate();
+
     const title = state?.title || "Без названия";
     const id = state?.id;
-
-    const navigate = useNavigate();
 
     const [html, setHtml] = useState("");
     const [toc, setToc] = useState([]);
     const [tocVis, setTocVis] = useState(false);
+    const [progress, setProgress] = useState(0);
 
     const [spineIdx, setSpineIdx] = useState(0);
     const [hasNext, setHasNext] = useState(false);
     const [hasPrev, setHasPrev] = useState(false);
+    const [total, setTotal] = useState(1);
+
+    const [bmVis, setBmVis] = useState(false);
+
+    const { bookmarks, add: addBookmark, remove: deleteBookmark, update: editBookmark } = useBookmarks(id);
+
+    useEffect(() => {
+        if (!containerRef.current) return;
+
+        const blocks = containerRef.current.querySelectorAll(
+            "p, td, blockquote"
+        );
+
+        blocks.forEach((block, idx) => {
+            block.dataset.blockIdx = idx;
+            block.classList.add("block-wrapper");
+            block.style.position = "relative";
+
+            const exists = bookmarks.find(
+                b => b.spine_reference === spineIdx && b.paragraph_index === idx
+            );
+            // Кнопка закладки
+            let btn = block.querySelector(".bookmark-btn-block");
+            if (!btn) {
+                btn = document.createElement("button");
+                btn.innerText = exists? "🏴": "⚐";
+                btn.className = "bookmark-btn-block";
+
+                block.appendChild(btn);
+
+                btn.addEventListener("click", () => {
+                    if (exists) {
+                        deleteBookmark (exists.id);
+                    } else {
+                        addBookmark({
+                            spineRef: spineIdx,
+                            paragraphIdx: idx,
+                            text: ""
+                        });
+                        setBmVis(true);
+                    }
+                });
+            }
+        });
+    }, [html, spineIdx, addBookmark]);
+
+    useEffect(() => {
+        const global =
+            spineIdx / total;
+        setProgress(global);
+    }, [spineIdx, total, html]);
 
     const loadChapter = async (loader) => {
         const chapter = await loader();
-        console.log(chapter)
         setHtml(chapter.html);
         setSpineIdx(chapter.spineIdx);
         setHasNext(chapter.hasNext);
         setHasPrev(chapter.hasPrev);
+        setTotal(chapter.totalSpines);
 
         spineRef.current = chapter.spineIdx;
 
         requestAnimationFrame(() => {
             containerRef.current?.scrollTo({ top: 0 });
         });
-    }
+    };
 
     const saveReadingPos = async () => {
         if (!id) return;
-
         try {
-            await postReadingPos(id, {
-                spineIdx: spineRef.current
-            });
+            await postReadingPos(id, spineRef.current);
         } catch (e) {
             console.error("Ошибка сохранения позиции", e);
         }
@@ -73,20 +118,17 @@ const Reader = () => {
     useEffect(() => {
         if (!id) return;
 
-        saveTimerRef.current = setInterval(() => {
-            void saveReadingPos();
-        }, 30_000);
+        saveTimerRef.current = setInterval(saveReadingPos, 30_000);
 
         (async () => {
             const tocData = await getToc(id);
             setToc(tocData);
 
             const lastPos = await getLastReadingPos(id);
-
-            const startSpine =
-                lastPos?.spineIdx !== undefined
-                    ? lastPos.spineIdx
-                    : 0; //при 0 ошибка
+            let startSpine = 2;
+            if (lastPos?.position && lastPos.position !== "0" && lastPos.position !== "NaN") {
+                startSpine = Number(lastPos.position);
+            }
 
             await loadChapter(() => getChapByIdx(id, startSpine));
         })();
@@ -94,42 +136,70 @@ const Reader = () => {
         return () => clearInterval(saveTimerRef.current);
     }, [id]);
 
+    const next = () => { if (hasNext) void loadChapter(() => getChapByIdx(id, spineIdx + 1)); };
+    const prev = () => { if (hasPrev) void loadChapter(() => getChapByIdx(id, spineIdx - 1)); };
+    const goToTocItem = (item) => { setTocVis(false); void loadChapter(() => getChapByToc(id, item)); };
+    const goToBookmark = async (bookmark) => {
+        if (!bookmark) return;
 
-    const next = () => {
-        if (!hasNext) return;
-        void loadChapter(() => getChapByIdx(id, spineIdx + 1));
+        if (bookmark.spine_reference !== spineIdx) {
+            await loadChapter(() => getChapByIdx(id, bookmark.spine_reference));
+        }
+
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                const container = containerRef.current;
+                if (!container) return;
+
+                const block = container.querySelector(
+                    `[data-block-idx="${bookmark.paragraph_index}"]`
+                );
+
+                if (!block) {
+                    console.warn("Блок не найден", bookmark.paragraph_index);
+                    return;
+                }
+
+                block.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center"
+                });
+
+                block.classList.add("bookmark-focus");
+                setTimeout(() => {
+                    block.classList.remove("bookmark-focus");
+                }, 1200);
+            });
+        });
     };
 
-    const prev = () => {
-        if (!hasPrev) return;
-        void loadChapter(() => getChapByIdx(id, spineIdx - 1));
-    };
-
-    const goToTocItem = (item) => {
-        setTocVis(false);
-        void loadChapter(() => getChapByToc(id, item));
-    };
-
-    const handleExit = () => {
-        void saveReadingPos();
-        navigate(-1);
-    };
+    const handleExit = () => { void saveReadingPos(); navigate(-1); };
 
     return (
         <div className="reader-wrapper">
-
             <div className="reader-header">
                 <div className="header-left">
-                    <button className="back-btn" onClick={handleExit}>
-                        ←
-                    </button>
-                    <button className="close-btn" onClick={() => setTocVis((prev) => !prev)}>
-                        ☰
-                    </button>
+                    <button className="back-btn" onClick={handleExit}>←</button>
+                    <button className="close-btn" onClick={() => setTocVis(v => !v)}>☰</button>
+                    <button className="bookmark-btn" onClick={() => setBmVis(v => !v)}>⚐</button>
                 </div>
-
                 <div className="header-center">{title}</div>
             </div>
+
+            <div className="reader-progress">
+                <div
+                    className="reader-progress-bar"
+                    style={{ width: `${progress * 100}%` }}
+                />
+            </div>
+
+            {bmVis &&
+                <BookmarksPanel
+                    bookmarks={bookmarks}
+                    onSelect={goToBookmark}
+                    onDelete={deleteBookmark}
+                    onUpdate={editBookmark} />
+            }
 
             {tocVis && (
                 <div className="toc-panel">
@@ -138,16 +208,12 @@ const Reader = () => {
                     ))}
                 </div>
             )}
+
             <div className="reader-main">
                 <div className="nav-button left" onClick={prev}>&lt;</div>
-
                 <div className="chapter" ref={containerRef}>
-                    <article
-                        className="chapter-html"
-                        dangerouslySetInnerHTML={{ __html: html }}
-                    />
+                    <article className="chapter-html" dangerouslySetInnerHTML={{ __html: html }} />
                 </div>
-
                 <div className="nav-button right" onClick={next}>&gt;</div>
             </div>
         </div>

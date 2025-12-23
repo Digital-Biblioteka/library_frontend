@@ -13,10 +13,11 @@ export async function searchBook(query) {
 
     if (!res.ok) {
         const msg = await res.text();
-        throw new Error(`Ошибка поиска книг: ${msg}`);
+        console.error(`Ошибка поиска книг: ${msg}`);
     }
 
-    return await res.json()
+    console.log(await res.json())
+    //return await res.json()
 }
 
 //Invoke-WebRequest -Method POST http://localhost:8001/search/books -ContentType application/json -Body '{ "query": "war" }' | Select-Object -ExpandProperty Content

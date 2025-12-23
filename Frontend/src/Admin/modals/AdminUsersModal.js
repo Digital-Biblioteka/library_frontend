@@ -134,9 +134,9 @@ export default function WorkWithUsersModal({ isOpen, onClose }) {
                 {(mode === "create" || mode === "edit") && (
                     <form className="modal-form" onSubmit={formik.handleSubmit}>
                         <input
-                            name="username"
+                            name="userName"
                             placeholder="Username"
-                            value={formik.values.username}
+                            value={formik.values.userName}
                             onChange={formik.handleChange}
                         />
 

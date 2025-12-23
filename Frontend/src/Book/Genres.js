@@ -116,7 +116,7 @@ export default function GenreSelect({ formik }) {
         try {
             await deleteGenre(id);
             setGenres(prev => prev.filter(g => g.value !== id));
-            if (formik.values.genre === id) await formik.setFieldValue("genre", "");
+            if (formik.values.genre === id) await formik.setFieldValue("genreId", id);
             setIsModalOpen(false);
         } catch (err) {
             alert("Ошибка удаления жанра");
@@ -129,8 +129,8 @@ export default function GenreSelect({ formik }) {
             <Select
                 options={genres}
                 placeholder="Жанр"
-                value={genres.find(g => g.value === formik.values.genre)}
-                onChange={option => formik.setFieldValue("genre", option.value)}
+                value={genres.find(g => g.label === formik.values.genre)}
+                onChange={option => formik.setFieldValue("genre", option.label)}
                 classNamePrefix="rs"
                 components={{ Option: GenreOption }}
                 onEditGenre={handleEditClick}

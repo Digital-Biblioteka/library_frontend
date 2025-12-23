@@ -29,7 +29,6 @@ export async function getBookPreview(id) {
 }
 
 export async function postReadingPos(id, position) {
-
     const res = await fetch(`${API_BASE}/${id}/pos`, {
         method: "POST",
         headers: {
@@ -76,7 +75,6 @@ export async function getToc(bookId) {
 }
 
 export async function getChapByToc(bookId, toc) {
-    console.log("TOC SENT:", toc);
 
     const res = await fetch (`${API_BASE}/${bookId}/toc/chapter`, {
         method: "POST",
@@ -93,18 +91,10 @@ export async function getChapByToc(bookId, toc) {
         console.error(`Ошибка получения главы: ${msg}`);
     }
 
-    return {
-        html: await res.text(),
-        spineIdx: Number(res.headers.get("X-Spine-Index")),
-        total: Number(res.headers.get("X-Total-Spines")),
-        hasNext: res.headers.get("X-Has-Next") === "true",
-        hasPrev: res.headers.get("X-Has-Prev") === "true",
-    };
+    return await res.json();
 }
 
 export async function getChapByIdx(bookId, spineIdx) {
-    console.log(spineIdx)
-
     const res = await fetch (`${API_BASE}/${bookId}/chapter/${spineIdx}`, {
         method: "GET",
         headers: {
@@ -117,11 +107,5 @@ export async function getChapByIdx(bookId, spineIdx) {
         throw new Error(`Ошибка получения главы: ${msg}`);
     }
 
-    return {
-        html: await res.text(),
-        spineIdx: Number(res.headers.get("X-Spine-Index")),
-        total: Number(res.headers.get("X-Total-Spines")),
-        hasNext: res.headers.get("X-Has-Next") === "true",
-        hasPrev: res.headers.get("X-Has-Prev") === "true",
-    };
+    return await res.json();
 }

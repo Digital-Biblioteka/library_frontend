@@ -7,6 +7,8 @@ import {getReadLaterList} from "../Book/api/readlaterApi";
 import UserBookModal from "./UserBookModal";
 import BookCard from "../Book/BookCard";
 import {deleteLastReadBook, getLastReadList} from "../Book/api/lastReadApi";
+import {deleteReview, getUserReviews} from "../Book/api/reviewApi";
+import StarRating from "../Book/Stars";
 
 function HomeUser() {
     const username = getUsername();
@@ -15,6 +17,7 @@ function HomeUser() {
     const [selectedBook, setSelectedBook] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [id, setId] = useState(null);
+    const [reviews, setReviews] = useState([]);
 
     useEffect(() => {
         if (activeTab === "want") {
@@ -27,6 +30,11 @@ function HomeUser() {
                 .then((books) => setBooksList(books))
                 .catch((err) => console.error(err));
         }
+        if (activeTab === "review") {
+            getUserReviews()
+                .then((reviews) => setReviews(reviews))
+                .catch((err) => console.error(err));
+        }
     }, [activeTab]);
 
 
@@ -37,11 +45,22 @@ function HomeUser() {
     }
 
     const handleDeleteFromList = (bookId) => {
-        if (activeTab === "reading") {
-            deleteLastReadBook(bookId)
-                .then(() => window.location.reload())
-                .catch(err => console.error("Ошибка удаления книги:", err));
-        }
+        deleteLastReadBook(bookId)
+            .then(() => {
+                setBooksList(prev => prev.filter(book => book.bookId !== bookId))
+            })
+            .catch(err => console.error("Ошибка удаления книги:", err));
+    }
+
+    const handleDeleteReview = (reviewId) => {
+        deleteReview(reviewId)
+            .then(() => {
+                // Обновляем state: убираем удалённый отзыв
+                setReviews(prevReviews =>
+                    prevReviews.filter(review => review.id !== reviewId)
+                );
+            })
+            .catch(err => console.error("Ошибка удаления книги:", err));
     }
 
     return (
@@ -130,7 +149,51 @@ function HomeUser() {
                     )}
 
                     {activeTab === "review" && (
-                        <p>Тут будут отзывы</p>
+                        <>
+                            {reviews.length === 0 ? (
+                                <p>Вы ещё не оставили ни одного отзыва</p>
+                            ) : (
+                                <div className="reviews-list-grid">
+                                    {reviews.map((review) => (
+                                        <div className="review-with-book" key={review.id}>
+                                            <div className="review-card">
+                                                <div className="review-left">
+                                                    <div className="review-text">
+                                                        {review.review_text}
+                                                    </div>
+                                                </div>
+                                                <div className="review-right">
+                                                    <StarRating
+                                                        value={review.rating}
+                                                        readOnly
+                                                        size={18}
+                                                    />
+                                                    <button className="close-btn"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleDeleteReview(review.id);
+                                                            }}>
+                                                        🗑
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div className="book-card-small">
+                                                <BookCard
+                                                    id={review.book.id}
+                                                    book={review.book}
+                                                    onClick={() =>
+                                                        handleBookClick({
+                                                            book: review.book,
+                                                            bookId: review.book.id
+                                                        })
+                                                    }
+                                                />
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </>
                     )}
                     <UserBookModal
                         isOpen={isModalOpen}

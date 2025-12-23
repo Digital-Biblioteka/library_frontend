@@ -16,7 +16,7 @@ export default function AdminEditorModal({ isOpen, onClose, book, onBookUpdated,
             title: book?.title,
             author: book?.author,
             description: book?.description,
-            genre: book?.genre,
+            genre: book?.genre?.genreName,
             publisher: book?.publisher
         },
 
