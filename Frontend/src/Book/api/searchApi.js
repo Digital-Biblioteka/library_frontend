@@ -20,17 +20,15 @@ export async function searchBook(query) {
     //return await res.json()
 }
 
-//Invoke-WebRequest -Method POST http://localhost:8001/search/books -ContentType application/json -Body '{ "query": "war" }' | Select-Object -ExpandProperty Content
-
 // export async function searchBook(query) {
 //     const res = await fetch ( `${API_BASE}`, {
 //         method: "GET",
 //     });
-//
+
 //     if (!res.ok) {
 //         const msg = await res.text();
 //         throw new Error(`Ошибка поиска книг: ${msg}`);
 //     }
-//
+
 //     return await res.json()
 // }
