@@ -104,7 +104,7 @@ const Reader = () => {
             };
 
         });
-    }, [html, spineIdx, addBookmark]);
+    }, [html, spineIdx, addBookmark, deleteBookmark, bookmarks]);
 
     useEffect(() => {
         const global =
@@ -157,8 +157,12 @@ const Reader = () => {
         return () => clearInterval(saveTimerRef.current);
     }, [id]);
 
-    const next = () => { if (hasNext) void loadChapter(() => getChapByIdx(id, spineIdx + 1)); };
-    const prev = () => { if (hasPrev) void loadChapter(() => getChapByIdx(id, spineIdx - 1)); };
+    const next = () => {
+        if (hasNext) void loadChapter(() => getChapByIdx(id, spineIdx + 1));
+    };
+    const prev = () => {
+        if (hasPrev) void loadChapter(() => getChapByIdx(id, spineIdx - 1));
+    };
     const goToTocItem = (item) => { setTocVis(false); void loadChapter(() => getChapByToc(id, item)); };
     const goToBookmark = async (bookmark) => {
         if (!bookmark) return;
@@ -235,13 +239,17 @@ const Reader = () => {
             )}
 
             <div className="reader-main">
-                <div className="nav-button left" onClick={prev}>&lt;</div>
+                { hasPrev && (
+                    <div className="nav-button left" onClick={prev}>&lt;</div>
+                )}
                 <div className={`chapter theme-${theme}`} ref={containerRef}>
                     <article className="chapter-html"
                              style={{ fontSize: `${fontSize}px` }}
                              dangerouslySetInnerHTML={{ __html: html }} />
                 </div>
-                <div className="nav-button right" onClick={next}>&gt;</div>
+                {hasNext && (
+                    <div className="nav-button right" onClick={next}>&gt;</div>
+                )}
             </div>
         </div>
     );

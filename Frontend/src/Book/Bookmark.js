@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
     addBookmark,
     getUsersBookmarks,
@@ -46,8 +46,6 @@ export function useBookmarks(bookId) {
 }
 
 export const BookmarksPanel = ({ bookmarks, onSelect, onDelete, onUpdate }) => {
-    const [note, setNote] = useState("");
-
     return (
         <div className="bookmark-panel">
             {bookmarks.length === 0 && (
@@ -58,28 +56,35 @@ export const BookmarksPanel = ({ bookmarks, onSelect, onDelete, onUpdate }) => {
 
             {bookmarks.map(bm => (
                 <div key={bm.id} className="bookmark-item">
-                    <div className="bookmark-main">
-                        <div className="bookmark-meta" onClick={() => onSelect(bm)}>
-                            Заметка {bm.id}
-                        </div>
-
-                        <input
-                            placeholder="Добавьте заметку"
-                            className=""
-                            value={note}
-                            onChange={(e) => setNote(e.target.value)}
-                        />
-
-                        <button onClick={() => onUpdate(bm.id, {
-                            spineRef: bm.spine_reference,
-                            paragraphIdx: bm.paragraph_index,
-                            text: note
-                        })}>ok</button>
-                        <button className="bookmark-delete" onClick={() => onDelete(bm.id)}>✕</button>
-                    </div>
-
+                        <Bookmark
+                            bm={bm}
+                            onSelect={onSelect}
+                            onDelete={onDelete}
+                            onUpdate={onUpdate} />
                 </div>
             ))}
         </div>
     );
+};
+
+export const Bookmark = ({ bm, onSelect, onDelete, onUpdate }) => {
+    const [note, setNote] = useState("");
+    return (
+        <div className="bookmark-meta">
+            <h4 style={{cursor:"pointer"}} onClick={() => onSelect(bm)}>Заметка {bm.spine_reference}</h4>
+            <input
+                type="text"
+                placeholder="Добавьте заметку"
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+            />
+
+            <button onClick={() => onUpdate(bm.id, {
+                spineRef: bm.spine_reference,
+                paragraphIdx: bm.paragraph_index,
+                text: note
+            })}>ok</button>
+            <button className="bookmark-delete" onClick={() => onDelete(bm.id)}>✕</button>
+        </div>
+    )
 };

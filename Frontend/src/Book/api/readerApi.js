@@ -9,7 +9,7 @@ export async function openBook(id) {
 
     if (!res.ok) {
         const msg = await res.text();
-        throw new Error(`Ошибка открывания книги: ${msg}`);
+        console.error(`Ошибка открывания книги: ${msg}`);
     }
 
     return res.text()
@@ -104,7 +104,7 @@ export async function getChapByIdx(bookId, spineIdx) {
 
     if(!res.ok) {
         const msg = await res.text()
-        throw new Error(`Ошибка получения главы: ${msg}`);
+        console.error(`Ошибка получения главы: ${msg}`);
     }
 
     return await res.json();
