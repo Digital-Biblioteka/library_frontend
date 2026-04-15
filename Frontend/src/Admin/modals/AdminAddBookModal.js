@@ -48,7 +48,7 @@ export default function WorkWIthBookModal({ isOpen, onClose }) {
                             title: values.title,
                             author: values.author,
                             description: values.description,
-                            genreId: values.genre,
+                            genre: values.genre,
                             publisher: values.publisher,
                         }
                         : null,

@@ -6,13 +6,13 @@ export async function openBook(id) {
         headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` }
     });
 
+    const text = await res.text();
 
     if (!res.ok) {
-        const msg = await res.text();
-        console.error(`Ошибка открывания книги: ${msg}`);
+        console.error(`Ошибка открывания книги: ${text}`);
     }
 
-    return res.text()
+    return text
 }
 
 export async function getBookPreview(id) {
