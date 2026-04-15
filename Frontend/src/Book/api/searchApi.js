@@ -16,8 +16,7 @@ export async function searchBook(query) {
         console.error(`Ошибка поиска книг: ${msg}`);
     }
 
-    console.log(await res.json())
-    //return await res.json()
+    return await res.json()
 }
 
 // export async function searchBook(query) {
