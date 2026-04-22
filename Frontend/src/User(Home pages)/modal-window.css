@@ -55,10 +55,10 @@
     margin-top: 10px;
 }
 
-/* Обычные input'ы */
 .modal-form input[type="text"],
 .modal-form input[type="file"],
-.rs__control { /* react-select */
+.modal-form input[type="password"],
+.rs__control {
     width: 100%;
     padding: 10px 12px;
     font-size: 16px;
@@ -68,7 +68,6 @@
     box-sizing: border-box;
 }
 
-/* Фокус */
 .modal-form input:focus,
 .modal-form textarea:focus,
 .rs__control--is-focused {
@@ -107,75 +106,10 @@
     margin-bottom: 4px;
 }
 
-.action-btn,
-.add-btn,
-.save-btn,
-.cancel-btn {
-    flex: 1;
-    padding: 10px 14px;
-    border-radius: 8px;
-    border: 1px solid #000000;
-    cursor: pointer;
-    font-size: 16px;
-}
-
-.action-btn {
-    background-color: #aaa;
-    color: white;
-}
-
-.action-btn:hover {
-    background-color: gainsboro;
-    color: black;
-}
-
-.add-btn {
-    background-color: #E35B91;
-    color: white;
-}
-
-.add-btn:hover {
-    background-color: #FFB1D0;
-}
-
-.save-btn {
-    background-color: #E35B91;
-    color: white;
-}
-
-.save-btn:hover {
-    background-color: #FFB1D0;
-}
-
-.cancel-btn {
-    background-color: #ccc;
-    color: #333;
-}
-
 .error {
     color: red;
     font-size: 13px;
     text-align: left;
-}
-
-.users-layout {
-    display: flex;
-    gap: 16px;
-}
-
-.users-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.users-table th, .users-table td {
-    padding: 8px;
-    border-bottom: 1px solid #ddd;
-}
-
-.users-table button {
-    margin-right: 6px;
-    cursor: pointer;
 }
 
 .like-btn {

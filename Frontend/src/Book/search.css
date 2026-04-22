@@ -52,19 +52,3 @@
     outline: none;
     transition: border 0.2s ease, box-shadow 0.2s ease;
 }
-
-.search-btn {
-    padding: 10px 24px;
-    background-color: #E35B91;
-    color: white;
-    font-size: 16px;
-    border: 1px solid #000000;
-    border-radius: 8px;
-    margin-left: 10px;
-    cursor: pointer;
-}
-
-.search-btn:hover {
-    background-color: #FFB1D0;
-    color: black;
-}

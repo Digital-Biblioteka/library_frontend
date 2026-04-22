@@ -1,9 +1,9 @@
 import React from "react";
-import HomeGuest from "./HomeGuest";
-import HomeUser from "./HomeUser";
-import HomeAdmin from "../Admin/HomeAdmin";
-import "./home.css";
-import { getRole } from "../Auth/utils/AuthToken";
+import HomeGuest from "./User(Home pages)/HomeGuest";
+import HomeUser from "./User(Home pages)/HomeUser";
+import HomeAdmin from "./Admin/HomeAdmin";
+import "./User(Home pages)/home.css";
+import { getRole } from "./Auth/utils/AuthToken";
 
 function HomePage() {
     const role = getRole();

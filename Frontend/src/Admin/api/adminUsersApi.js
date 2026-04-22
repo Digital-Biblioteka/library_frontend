@@ -28,7 +28,7 @@ export async function createUser (userData) {
 
     if (!res.ok) {
         const msg = res.text();
-        console.error(`Ошибка добавления пользователя: ${msg}`)
+        console.error(`Ошибка добавления пользователя: ${msg + userData}`)
     }
 
     return res.json();

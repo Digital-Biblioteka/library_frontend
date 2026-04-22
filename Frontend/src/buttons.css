@@ -1,0 +1,74 @@
+.action-btn,
+.add-btn,
+.save-btn,
+.logout-btn,
+.admin-button,
+.search-btn,
+.sign-up-btn,
+.sign-in-btn {
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid #000000;
+    cursor: pointer;
+    font-size: 16px;
+    height: fit-content;
+}
+
+.add-btn,
+.save-btn,
+.logout-btn,
+.admin-button,
+.search-btn,
+.sign-up-btn,
+.sign-in-btn {
+    background-color: #E35B91;
+    color: white;
+}
+
+.add-btn:hover,
+.save-btn:hover,
+.logout-btn:hover,
+.admin-button:hover,
+.search-btn:hover,
+.close-btn:hover,
+.sign-up-btn:hover,
+.sign-in-btn:hover {
+    background-color: #FFB1D0;
+    color: black;
+}
+
+.search-btn {
+    margin-top: 10px;
+}
+
+.admin-button {
+    margin-left: 10px;
+    margin-top: 20px;
+}
+
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: #000000;
+    padding: 4px;
+    border-radius: 6px;
+}
+
+.close-btn:hover {
+    background-color: #E35B91;
+}
+
+.action-btn {
+    background-color: #aaa;
+    color: white;
+}
+
+.action-btn:hover {
+    background-color: gainsboro;
+    color: black;
+}

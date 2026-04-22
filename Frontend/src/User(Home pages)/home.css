@@ -34,36 +34,6 @@
   gap: 12px;
 }
 
-.sign-up-btn {
-  padding: 10px 24px;
-  background-color: #E35B91;
-  color: white;
-  font-size: 16px;
-  border: 1px solid #000000;
-  border-radius: 8px;
-  margin-left: 10px
-}
-
-.sign-up-btn:hover {
-  background-color: #FFB1D0;
-  color: black;
-}
-
-.sign-in-btn {
-  padding: 10px 24px;
-  background-color: #E35B91;
-  color: white;
-  font-size: 16px;
-  border: 1px solid #000000;
-  border-radius: 8px;
-  margin-left: 10px
-}
-
-.sign-in-btn:hover {
-  background-color: #FFB1D0;
-  color: black;
-}
-
 .home-center {
   position: absolute;
   top: 40%;
@@ -76,4 +46,5 @@
   width: 90%;
   text-align: center;
   line-height: 1.2;
+  margin-bottom: 20px;
 }
