@@ -2,11 +2,13 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./search.css";
 import AdvancedSearchForm from "./SearchForm";
+import { IconBook, IconQuote, IconSearch } from "./Icons";
 
 function SearchField() {
     const navigate = useNavigate();
     const [searchValue, setSearchValue] = useState("");
     const [showAdvanced, setShowAdvanced] = useState(false);
+    const [searchMode, setSearchMode] = useState("metadata"); // "metadata" | "quote"
 
     const [advancedValues, setAdvancedValues] = useState({
         title: null,
@@ -16,6 +18,13 @@ function SearchField() {
     });
 
     const handleSearch = () => {
+        const plainQuery = encodeURIComponent(searchValue || "");
+
+        if (searchMode === "quote") {
+            navigate(`/book-list?query=${plainQuery}&contentSearch=${encodeURIComponent(searchValue || "")}`);
+            return;
+        }
+
         const queryObject = {
             query: searchValue || null,
             title: advancedValues.title,
@@ -25,8 +34,6 @@ function SearchField() {
         };
 
         const encoded = encodeURIComponent(JSON.stringify(queryObject));
-        const plainQuery = encodeURIComponent(searchValue || "");
-
         navigate(`/book-list?query=${plainQuery}&search=${encoded}`);
     };
 
@@ -50,7 +57,7 @@ function SearchField() {
             <div className="search-container">
                 <div className="search-input-wrapper">
                     <input
-                        placeholder="я ищу..."
+                        placeholder={searchMode === "quote" ? "ищу цитату..." : "я ищу..."}
                         className="search-field"
                         value={searchValue}
                         onChange={(e) => setSearchValue(e.target.value)}
@@ -74,7 +81,25 @@ function SearchField() {
                     />
                 )}
 
+                <div className="search-mode-toggle">
+                    <button
+                        className={`mode-btn ${searchMode === "metadata" ? "active" : ""}`}
+                        onClick={() => setSearchMode("metadata")}
+                        title="Поиск по метаданным"
+                    >
+                        <IconBook size={16} color={searchMode === "metadata" ? "#fff" : "#555"} />
+                    </button>
+                    <button
+                        className={`mode-btn ${searchMode === "quote" ? "active" : ""}`}
+                        onClick={() => setSearchMode("quote")}
+                        title="Поиск по цитате"
+                    >
+                        <IconQuote size={16} color={searchMode === "quote" ? "#fff" : "#555"} />
+                    </button>
+                </div>
+
                 <button className="search-btn" onClick={handleSearch}>
+                    <IconSearch size={16} color="currentColor" style={{marginRight: 6, verticalAlign: 'middle'}} />
                     Поиск
                 </button>
 

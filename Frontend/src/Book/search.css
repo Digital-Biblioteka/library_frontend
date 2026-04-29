@@ -68,3 +68,32 @@
     background-color: #FFB1D0;
     color: black;
 }
+
+.search-mode-toggle {
+    display: flex;
+    gap: 2px;
+    margin-top: 10px;
+}
+
+.mode-btn {
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    background: white;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.mode-btn:hover {
+    background: #f5f5f5;
+}
+
+.mode-btn.active {
+    background: #E35B91;
+    border-color: #E35B91;
+    color: #fff;
+}
