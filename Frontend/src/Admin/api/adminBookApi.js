@@ -48,10 +48,12 @@ export async function elasticAdmin () {
 
     if (!res.ok) {
         const msg = await res.text();
-        console.error(`Ошибка удаления книги: ${msg}`);
+        console.error(`Ошибка индексации: ${msg}`);
+        return;
     }
 
-    console.log(await res.json())
+    const data = await res.json();
+    console.log(data);
 }
 
 export async function deleteBook(id) {
@@ -81,7 +83,9 @@ export async function editBook(id, book) {
     if (!res.ok) {
         const msg = await res.text();
         console.error(`Ошибка редактировния данных книги: ${msg}`);
+        return;
     }
 
-    console.log(await res.json())
+    const data = await res.json();
+    console.log(data);
 }

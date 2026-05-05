@@ -106,3 +106,55 @@
     grid-column: 1 / -1; /* Чтобы занял всю ширину сетки */
     margin-top: 20px;
 }
+
+.content-result-card {
+    background: white;
+    border-radius: 14px;
+    padding: 16px;
+    box-shadow: 0 0 6px rgba(0,0,0,0.1);
+    cursor: pointer;
+    transition: transform .2s;
+    width: 280px;
+}
+
+.content-result-card:hover {
+    transform: scale(1.02);
+}
+
+.content-result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 6px;
+}
+
+.content-result-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+}
+
+.content-result-author {
+    font-size: 13px;
+    color: #777;
+}
+
+.content-result-chapter {
+    font-size: 12px;
+    color: #999;
+    margin-bottom: 8px;
+}
+
+.content-result-snippet {
+    font-size: 14px;
+    color: #444;
+    line-height: 1.4;
+}
+
+.content-result-snippet em {
+    background-color: #FFB1D0;
+    font-style: normal;
+    font-weight: 600;
+    padding: 0 2px;
+    border-radius: 2px;
+}

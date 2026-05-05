@@ -6,11 +6,14 @@ import AdminEditorModal from "../Admin/modals/AdminBookEditModal";
 import {getRole} from "../Auth/utils/AuthToken";
 import SearchField from "./SearchField";
 import {searchBook} from "./api/searchApi";
+import {searchContent} from "./api/contentSearchApi";
 import UserBookModal from "../User(Home pages)/UserBookModal";
 import BookCard from "./BookCard";
+import ContentSearchResultCard from "./ContentSearchResultCard";
 
 export default function BooksList() {
     const [books, setBooks] = useState([]);
+    const [contentResults, setContentResults] = useState([]);
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const [isAdminModalOpen, setAdminIsModalOpen] = useState(false);
@@ -18,16 +21,23 @@ export default function BooksList() {
     const [isUserModalOpen, setIsUserModalOpen] = useState(false);
 
     const query = searchParams.get("query");
-
     const params = searchParams.get("search");
+    const contentQuery = searchParams.get("contentSearch");
+
+    const isContentSearch = !!contentQuery;
 
     useEffect(() => {
-        if (params) {
+        if (contentQuery) {
+            searchContent(contentQuery).then(setContentResults).catch(console.error);
+            setBooks([]);
+        } else if (params) {
             searchBook(params).then(async (loadedBooks) => {
                 setBooks(loadedBooks);
                 console.log(loadedBooks)
             }).catch(console.error);
+            setContentResults([]);
         } else {
+            setContentResults([]);
             if(getRole() === "ROLE_ADMIN"){
                 getAllBooks().then(async (loadedBooks) => {
                     setBooks(loadedBooks);
@@ -35,7 +45,7 @@ export default function BooksList() {
                 void elasticAdmin();
             }
         }
-    }, [params]);
+    }, [params, contentQuery]);
 
     const handleBookClick = (book) => {
         setSelectedBook(book);
@@ -44,7 +54,14 @@ export default function BooksList() {
         } else {
             setIsUserModalOpen(true);
         }
-    }
+    };
+
+    const handleContentResultClick = (result) => {
+        const emMatch = (result.textSnippet || "").match(/<em>(.*?)<\/em>/);
+        const highlightText = emMatch ? emMatch[1] : null;
+        const spineIdx = result.spineIndex != null && result.spineIndex >= 0 ? result.spineIndex : result.chapterIndex;
+        navigate(`/reader`, { state: { id: result.bookId, title: result.title, searchChapterIndex: spineIdx, searchParagraphIndex: result.paragraphIndex, searchHighlightText: highlightText } });
+    };
 
     return (
         <div className="books-wrapper">
@@ -57,17 +74,31 @@ export default function BooksList() {
 
             <div className="content-area ">
                 <div className="books-grid">
-                    {books.length === 0 ? (
-                        <p className="empty-result">По вашему запросу "{query}" ничего не найдено</p>
+                    {isContentSearch ? (
+                        contentResults.length === 0 ? (
+                            <p className="empty-result">По цитате "{query}" ничего не найдено</p>
+                        ) : (
+                            contentResults.map((r, idx) => (
+                                <ContentSearchResultCard
+                                    key={idx}
+                                    result={r}
+                                    onBookClick={handleContentResultClick}
+                                />
+                            ))
+                        )
                     ) : (
-                        books.map((book) => (
-                            <BookCard
-                                key = {book.id}
-                                id = {book.id}
-                                book = {book}
-                                onClick = {() => handleBookClick(book)}
-                            />
-                        ))
+                        books.length === 0 ? (
+                            <p className="empty-result">По вашему запросу "{query}" ничего не найдено</p>
+                        ) : (
+                            books.map((book) => (
+                                <BookCard
+                                    key = {book.id}
+                                    id = {book.id}
+                                    book = {book}
+                                    onClick = {() => handleBookClick(book)}
+                                />
+                            ))
+                        )
                     )}
                 </div>
             </div>

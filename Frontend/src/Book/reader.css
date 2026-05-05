@@ -231,3 +231,116 @@
 .theme-dark .chapter-html {
     color: #e0c0cd;
 }
+
+.search-btn-reader {
+    background: none;
+    cursor: pointer;
+    font-size: 18px;
+    border: none;
+    padding: 4px 8px;
+}
+
+.search-btn-reader:hover {
+    opacity: 0.7;
+}
+
+.reader-search-panel {
+    position: absolute;
+    top: 55px;
+    right: 10px;
+    width: 320px;
+    max-height: 70vh;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    z-index: 200;
+    padding: 12px;
+    overflow-y: auto;
+}
+
+.reader-search-input-row {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 8px;
+}
+
+.reader-search-input {
+    flex: 1;
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+}
+
+.reader-search-input:focus {
+    border-color: #E35B91;
+}
+
+.reader-search-go {
+    padding: 8px 14px;
+    background: #E35B91;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.reader-search-go:hover {
+    background: #FFB1D0;
+    color: black;
+}
+
+.reader-search-results {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.reader-search-result-item {
+    padding: 8px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.reader-search-result-item:hover {
+    background: #f5f0f2;
+}
+
+.reader-search-result-chapter {
+    display: block;
+    font-size: 11px;
+    color: #999;
+    margin-bottom: 4px;
+}
+
+.reader-search-result-snippet {
+    display: block;
+    font-size: 13px;
+    color: #444;
+    line-height: 1.4;
+}
+
+.reader-search-result-snippet em {
+    background-color: #FFB1D0;
+    font-style: normal;
+    font-weight: 600;
+    padding: 0 2px;
+    border-radius: 2px;
+}
+
+mark.search-highlight {
+    background-color: #FFD700;
+    color: inherit;
+    padding: 1px 3px;
+    border-radius: 3px;
+    box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.4);
+    transition: background-color 0.3s ease;
+}
+
+.block-wrapper.bookmark-focus {
+    background-color: rgba(255, 177, 208, 0.25);
+    transition: background-color 0.3s ease;
+}

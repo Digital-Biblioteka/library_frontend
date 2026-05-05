@@ -3,7 +3,9 @@ import { useLocation, useNavigate } from "react-router-dom";
 import "./reader.css";
 import "./bookmark.css";
 import { getLastReadingPos, getToc, postReadingPos, getChapByToc, getChapByIdx } from "./api/readerApi";
+import { searchContent } from "./api/contentSearchApi";
 import { useBookmarks, BookmarksPanel } from "./Bookmark";
+import { IconSearch } from "./Icons";
 
 const TocItem = ({ item, goToItem, level = 0 }) => (
     <div>
@@ -30,6 +32,9 @@ const Reader = () => {
 
     const title = state?.title || "Без названия";
     const id = state?.id;
+    const searchChapterIndex = state?.searchChapterIndex;
+    const searchParagraphIndex = state?.searchParagraphIndex;
+    const searchHighlightText = state?.searchHighlightText;
 
     const [html, setHtml] = useState("");
     const [toc, setToc] = useState([]);
@@ -42,6 +47,9 @@ const Reader = () => {
     const [total, setTotal] = useState(1);
 
     const [bmVis, setBmVis] = useState(false);
+    const [searchVis, setSearchVis] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [searchResults, setSearchResults] = useState([]);
 
     const { bookmarks, add: addBookmark, remove: deleteBookmark, update: editBookmark } = useBookmarks(id);
 
@@ -112,6 +120,60 @@ const Reader = () => {
         setProgress(global);
     }, [spineIdx, total, html]);
 
+    const highlightTextInBlock = (block, text) => {
+        const walker = document.createTreeWalker(block, NodeFilter.SHOW_TEXT, null);
+        const textNodes = [];
+        while (walker.nextNode()) textNodes.push(walker.currentNode);
+
+        const escaped = text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp(escaped, 'gi');
+
+        for (const node of textNodes) {
+            const val = node.nodeValue;
+            if (!regex.test(val)) continue;
+            regex.lastIndex = 0;
+
+            const frag = document.createDocumentFragment();
+            let lastIdx = 0;
+            let match;
+            while ((match = regex.exec(val)) !== null) {
+                if (match.index > lastIdx) {
+                    frag.appendChild(document.createTextNode(val.slice(lastIdx, match.index)));
+                }
+                const mark = document.createElement('mark');
+                mark.className = 'search-highlight';
+                mark.textContent = match[0];
+                frag.appendChild(mark);
+                lastIdx = regex.lastIndex;
+            }
+            if (lastIdx < val.length) {
+                frag.appendChild(document.createTextNode(val.slice(lastIdx)));
+            }
+            node.parentNode.replaceChild(frag, node);
+        }
+    };
+
+    const clearHighlights = () => {
+        const container = containerRef.current;
+        if (!container) return;
+        container.querySelectorAll('mark.search-highlight').forEach(mark => {
+            const parent = mark.parentNode;
+            parent.replaceChild(document.createTextNode(mark.textContent), mark);
+            parent.normalize();
+        });
+        container.removeEventListener('click', clearHighlights);
+        container.removeEventListener('wheel', clearHighlights);
+        container.removeEventListener('touchstart', clearHighlights);
+    };
+
+    const clearHighlightsOnInteraction = () => {
+        const container = containerRef.current;
+        if (!container) return;
+        container.addEventListener('click', clearHighlights, { once: true });
+        container.addEventListener('wheel', clearHighlights, { once: true });
+        container.addEventListener('touchstart', clearHighlights, { once: true });
+    };
+
     const loadChapter = async (loader) => {
         const chapter = await loader();
         setHtml(chapter.html);
@@ -145,13 +207,42 @@ const Reader = () => {
             const tocData = await getToc(id);
             setToc(tocData);
 
-            const lastPos = await getLastReadingPos(id);
             let startSpine = 2;
-            if (lastPos?.position && lastPos.position !== "0" && lastPos.position !== "NaN") {
-                startSpine = Number(lastPos.position);
+
+            //console.log("[Reader] searchChapterIndex=", searchChapterIndex, "searchParagraphIndex=", searchParagraphIndex, "state=", state);
+
+            if (searchChapterIndex != null) {
+                startSpine = Number(searchChapterIndex);
+            } else {
+                const lastPos = await getLastReadingPos(id);
+                if (lastPos?.position && lastPos.position !== "0" && lastPos.position !== "NaN") {
+                    startSpine = Number(lastPos.position);
+                }
             }
 
             await loadChapter(() => getChapByIdx(id, startSpine));
+
+            if (searchParagraphIndex != null) {
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        const container = containerRef.current;
+                        if (!container) return;
+                        const block = container.querySelector(
+                            `[data-block-idx="${searchParagraphIndex}"]`
+                        );
+                        if (block) {
+                            block.scrollIntoView({ behavior: "smooth", block: "center" });
+                            block.classList.add("bookmark-focus");
+                            setTimeout(() => block.classList.remove("bookmark-focus"), 1200);
+
+                            if (searchHighlightText) {
+                                highlightTextInBlock(block, searchHighlightText);
+                                clearHighlightsOnInteraction();
+                            }
+                        }
+                    });
+                });
+            }
         })();
 
         return () => clearInterval(saveTimerRef.current);
@@ -200,6 +291,42 @@ const Reader = () => {
 
     const handleExit = () => { void saveReadingPos(); navigate(-1); };
 
+    const handleContentSearch = async () => {
+        if (!searchQuery.trim() || !id) return;
+        try {
+            const results = await searchContent(searchQuery, id, 20);
+            setSearchResults(results);
+        } catch (e) {
+            console.error("Ошибка поиска внутри книги", e);
+        }
+    };
+
+    const goToSearchResult = async (result) => {
+        setSearchVis(false);
+        setSearchResults([]);
+        setSearchQuery("");
+
+        const targetIdx = result.spineIndex != null && result.spineIndex >= 0 ? result.spineIndex : result.chapterIndex;
+        if (targetIdx !== spineIdx) {
+            await loadChapter(() => getChapByIdx(id, targetIdx));
+        }
+
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                const container = containerRef.current;
+                if (!container) return;
+                const block = container.querySelector(
+                    `[data-block-idx="${result.paragraphIndex}"]`
+                );
+                if (block) {
+                    block.scrollIntoView({ behavior: "smooth", block: "center" });
+                    block.classList.add("bookmark-focus");
+                    setTimeout(() => block.classList.remove("bookmark-focus"), 1200);
+                }
+            });
+        });
+    };
+
     return (
         <div className="reader-wrapper ">
             <div className="reader-header">
@@ -211,6 +338,7 @@ const Reader = () => {
                     <button className="theme-btn" onClick={() => setTheme("dark")}>☽</button>
                     <button className="close-btn" onClick={() => setTocVis(v => !v)}>☰</button>
                     <button className="bookmark-btn" onClick={() => setBmVis(v => !v)}>⚐</button>
+                    <button className="search-btn-reader" onClick={() => setSearchVis(v => !v)}><IconSearch size={18} /></button>
                 </div>
                 <div className="header-center">{title}</div>
             </div>
@@ -229,6 +357,38 @@ const Reader = () => {
                     onDelete={deleteBookmark}
                     onUpdate={editBookmark} />
             }
+
+            {searchVis && (
+                <div className="reader-search-panel">
+                    <div className="reader-search-input-row">
+                        <input
+                            className="reader-search-input"
+                            placeholder="Поиск по книге..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            onKeyDown={(e) => e.key === "Enter" && handleContentSearch()}
+                        />
+                        <button className="reader-search-go" onClick={handleContentSearch}>Найти</button>
+                    </div>
+                    {searchResults.length > 0 && (
+                        <div className="reader-search-results">
+                            {searchResults.map((r, idx) => (
+                                <div
+                                    key={idx}
+                                    className="reader-search-result-item"
+                                    onClick={() => goToSearchResult(r)}
+                                >
+                                    <span className="reader-search-result-chapter">{r.chapter}</span>
+                                    <span
+                                        className="reader-search-result-snippet"
+                                        dangerouslySetInnerHTML={{ __html: r.textSnippet }}
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            )}
 
             {tocVis && (
                 <div className="toc-panel">
