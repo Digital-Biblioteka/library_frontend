@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./search.css";
+import "../buttons.css"
 import AdvancedSearchForm from "./SearchForm";
 import { IconBook, IconQuote, IconSearch } from "./Icons";
 
@@ -73,7 +74,6 @@ function SearchField() {
                     </button>
                 </div>
 
-                {/* модалка */}
                 {showAdvanced && (
                     <AdvancedSearchForm
                         onClose={() => setShowAdvanced(false)}

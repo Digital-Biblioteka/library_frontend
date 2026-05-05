@@ -121,6 +121,7 @@ export default function WorkWIthBookModal({ isOpen, onClose }) {
 
                             {!manualMode && (
                                 <button
+                                    className="action-btn"
                                     type="button"
                                     onClick={() => setManualMode(true)}>
                                     Ввести данные книжки вручную
@@ -135,7 +136,7 @@ export default function WorkWIthBookModal({ isOpen, onClose }) {
                                 <button type="submit" className="save-btn">
                                     Сохранить
                                 </button>
-                                <button type="button" className="cancel-btn"
+                                <button type="button" className="action-btn"
                                     onClick={() => setMode("main")}>
                                     Назад
                                 </button>

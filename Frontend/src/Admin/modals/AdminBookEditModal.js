@@ -99,7 +99,7 @@ export default function AdminEditorModal({ isOpen, onClose, book, onBookUpdated,
                                 <button type="submit" className="save-btn">
                                     Сохранить
                                 </button>
-                                <button type="button" className="cancel-btn"
+                                <button type="button" className="action-btn"
                                     onClick={() => setMode("main")}>
                                     Назад
                                 </button>

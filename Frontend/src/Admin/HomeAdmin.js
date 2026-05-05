@@ -1,6 +1,7 @@
 import { getUsername, logout } from "../Auth/utils/AuthToken";
 import "../User(Home pages)/home.css";
 import "./admin-home.css"
+import "../buttons.css"
 import WorkWIthBookModal from "./modals/AdminAddBookModal";
 import {useState} from "react";
 import WorkWithUsersModal from "./modals/AdminUsersModal";
@@ -25,7 +26,7 @@ export default function HomeAdmin() {
                 </div>
 
                 <div className="admin-panel">
-                    <label className="label">Панель администратора</label>
+                    <label className="label" >Панель администратора</label>
                     <button className="admin-button"
                         onClick={() => setIsBookModalOpen(true)}>
                         Управление книгами
