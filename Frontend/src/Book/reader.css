@@ -326,18 +326,12 @@
 .reader-search-result-snippet em {
     background-color: #FFB1D0;
     font-style: normal;
-    font-weight: 600;
-    padding: 0 2px;
-    border-radius: 2px;
 }
 
-mark.search-highlight {
-    background-color: #FFD700;
-    color: inherit;
-    padding: 1px 3px;
-    border-radius: 3px;
-    box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.4);
-    transition: background-color 0.3s ease;
+.search-highlight-block {
+    background-color: #FFF3B0 !important;
+    border-left: 3px solid #FFD700;
+    transition: background-color 0.3s;
 }
 
 .block-wrapper.bookmark-focus {
