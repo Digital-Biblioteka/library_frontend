@@ -15,7 +15,9 @@ function SearchField() {
         title: null,
         author: null,
         genre: null,
-        description: null
+        description: null,
+        minRating: null,
+        reviewQuery: null
     });
 
     const handleSearch = () => {
@@ -31,7 +33,9 @@ function SearchField() {
             title: advancedValues.title,
             author: advancedValues.author,
             genre: advancedValues.genre,
-            description: advancedValues.description
+            description: advancedValues.description,
+            minRating: advancedValues.minRating,
+            reviewQuery: advancedValues.reviewQuery
         };
 
         const encoded = encodeURIComponent(JSON.stringify(queryObject));
@@ -46,7 +50,9 @@ function SearchField() {
             title: advData.title,
             author: advData.author,
             genre: advData.genre,
-            description: advData.description
+            description: advData.description,
+            minRating: advData.minRating,
+            reviewQuery: advData.reviewQuery
         };
 
         const encoded = encodeURIComponent(JSON.stringify(queryObject));

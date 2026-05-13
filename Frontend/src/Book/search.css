@@ -97,3 +97,18 @@
     border-color: #E35B91;
     color: #fff;
 }
+
+.rating-filter-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 8px 0;
+}
+.rating-filter-row label {
+    font-size: 14px;
+    color: #333;
+}
+.rating-filter-row input[type="range"] {
+    width: 100%;
+    cursor: pointer;
+}

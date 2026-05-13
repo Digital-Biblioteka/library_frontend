@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {elasticAdmin, getAllBooks} from "../Admin/api/adminBookApi";
+import {getPublicBooks} from "../Admin/api/adminBookApi";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import "./book-list.css";
 import AdminEditorModal from "../Admin/modals/AdminBookEditModal";
@@ -38,12 +38,9 @@ export default function BooksList() {
             setContentResults([]);
         } else {
             setContentResults([]);
-            if(getRole() === "ROLE_ADMIN"){
-                getAllBooks().then(async (loadedBooks) => {
-                    setBooks(loadedBooks);
-                }).catch(console.error);
-                void elasticAdmin();
-            }
+            getPublicBooks().then(async (loadedBooks) => {
+                setBooks(loadedBooks);
+            }).catch(console.error);
         }
     }, [params, contentQuery]);
 
