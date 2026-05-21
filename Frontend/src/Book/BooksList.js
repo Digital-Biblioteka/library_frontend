@@ -19,6 +19,7 @@ export default function BooksList() {
     const [isAdminModalOpen, setAdminIsModalOpen] = useState(false);
     const [selectedBook, setSelectedBook] = useState('');
     const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+    const [sortOrder, setSortOrder] = useState(null); // null=default(relevance), "desc", "asc"
 
     const query = searchParams.get("query");
     const params = searchParams.get("search");
@@ -60,6 +61,24 @@ export default function BooksList() {
         navigate(`/reader`, { state: { id: result.bookId, title: result.title, searchChapterIndex: spineIdx, searchParagraphIndex: result.paragraphIndex, searchHighlightText: highlightText } });
     };
 
+    const displayBooks = sortOrder
+        ? [...books].sort((a, b) => {
+            const rA = a.rating ?? 0;
+            const rB = b.rating ?? 0;
+            return sortOrder === "desc" ? rB - rA : rA - rB;
+        })
+        : books;
+
+    const toggleSort = () => {
+        setSortOrder(prev => prev === null ? "desc" : prev === "desc" ? "asc" : null);
+    };
+
+    const sortLabel = sortOrder === null
+        ? "По релевантности"
+        : sortOrder === "desc"
+            ? "Рейтинг \u2193"
+            : "Рейтинг \u2191";
+
     return (
         <div className="books-wrapper">
 
@@ -68,6 +87,14 @@ export default function BooksList() {
                 <h1>Cупер мега крутая онлайн библиотека класс вау 💯</h1>
                 <SearchField/>
             </div>
+
+            {books.length > 0 && !isContentSearch && (
+                <div className="sort-controls">
+                    <button className="rating-sort-btn" onClick={toggleSort}>
+                        {sortLabel}
+                    </button>
+                </div>
+            )}
 
             <div className="content-area ">
                 <div className="books-grid">
@@ -87,7 +114,7 @@ export default function BooksList() {
                         books.length === 0 ? (
                             <p className="empty-result">По вашему запросу "{query}" ничего не найдено</p>
                         ) : (
-                            books.map((book) => (
+                            displayBooks.map((book) => (
                                 <BookCard
                                     key = {book.id}
                                     id = {book.id}

@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import "./search.css";
 import AdvancedSearchForm from "./SearchForm";
 import { IconBook, IconQuote, IconSearch } from "./Icons";
+import { suggestBook } from "./api/searchApi";
 
 function SearchField() {
     const navigate = useNavigate();
@@ -18,6 +19,51 @@ function SearchField() {
         minRating: null,
         reviewQuery: null
     });
+
+    const [suggestions, setSuggestions] = useState([]);
+    const [showSuggest, setShowSuggest] = useState(false);
+    const suggestTimer = useRef(null);
+    const suggestRef = useRef(null);
+
+    useEffect(() => {
+        if (suggestTimer.current) {
+            clearTimeout(suggestTimer.current);
+        }
+        if (!searchValue.trim() || searchMode !== "metadata") {
+            setSuggestions([]);
+            setShowSuggest(false);
+            return;
+        }
+        suggestTimer.current = setTimeout(async () => {
+            try {
+                const results = await suggestBook(searchValue, 8);
+                setSuggestions(results);
+                setShowSuggest(results.length > 0);
+            } catch {
+                setSuggestions([]);
+                setShowSuggest(false);
+            }
+        }, 300);
+
+        return () => {
+            if (suggestTimer.current) clearTimeout(suggestTimer.current);
+        };
+    }, [searchValue, searchMode]);
+
+    useEffect(() => {
+        const handler = (e) => {
+            if (suggestRef.current && !suggestRef.current.contains(e.target)) {
+                setShowSuggest(false);
+            }
+        };
+        document.addEventListener("mousedown", handler);
+        return () => document.removeEventListener("mousedown", handler);
+    }, []);
+
+    const handleSuggestClick = (text) => {
+        setSearchValue(text);
+        setShowSuggest(false);
+    };
 
     const handleSearch = () => {
         const plainQuery = encodeURIComponent(searchValue || "");
@@ -61,12 +107,15 @@ function SearchField() {
     return (
         <div className="search-wrapper">
             <div className="search-container">
-                <div className="search-input-wrapper">
+                <div className="search-input-wrapper" ref={suggestRef}>
                     <input
                         placeholder={searchMode === "quote" ? "ищу цитату..." : "я ищу..."}
                         className="search-field"
                         value={searchValue}
                         onChange={(e) => setSearchValue(e.target.value)}
+                        onFocus={() => {
+                            if (suggestions.length > 0) setShowSuggest(true);
+                        }}
                     />
 
                     <button
@@ -77,6 +126,21 @@ function SearchField() {
                     >
                         ⚙
                     </button>
+
+                    {/* выпадающий список автодополнения */}
+                    {showSuggest && (
+                        <div className="suggest-dropdown">
+                            {suggestions.map((s, i) => (
+                                <div
+                                    key={i}
+                                    className="suggest-item"
+                                    onClick={() => handleSuggestClick(s.text)}
+                                >
+                                    {s.text}
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 {/* модалка */}
