@@ -29,15 +29,6 @@ export async function getAllBooks() {
     return await res.json()
 }
 
-// @GetMapping("admin/books/elastic")
-// public List<Book> putBooksInElastic() {
-//     List<Book> books = getBooks();
-//     for (Book book : books) {
-//         searchIndexClient.indexBook(book);
-//     }
-//     return books;
-// }
-
 export async function elasticAdmin () {
     const res = await fetch(`${API_BASE}/elastic`, {
         method: "GET",

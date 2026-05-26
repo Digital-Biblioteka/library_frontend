@@ -16,14 +16,15 @@ export async function getAllUsers () {
     return res.json();
 }
 
+//недоделано требует проверки
 export async function createUser (userData) {
-    console.log(userData)
     const res = await fetch(`${API_BASE}`, {
         method: "POST",
         headers: {
+            "Content-Type": "application/json",
             "Authorization": `Bearer ${localStorage.getItem("token")}`
         },
-        body: userData
+        body: JSON.Stringify(userData)
     });
 
     if (!res.ok) {

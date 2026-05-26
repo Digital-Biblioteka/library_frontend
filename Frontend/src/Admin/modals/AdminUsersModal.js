@@ -1,80 +1,41 @@
 import React, { useEffect, useState } from "react";
 import "./admin-modal-window.css";
 
-import { useFormik } from "formik";
 import {
     getAllUsers,
-    createUser,
-    deleteUser,
-    editUser
+    deleteUser
 } from "../api/adminUsersApi";
-import Select from "react-select";
-import {getEmail} from "../../Auth/utils/AuthToken";
 
-const roles = [
-    { value: "ROLE_USER", label: "USER" },
-    { value: "ROLE_ADMIN", label: "ADMIN" },
-];
-
-const validate = (values) => {
-    const errors = {};
-
-    if (!values.userName) errors.username = "Username cannot be empty";
-    if (!values.email) errors.email = "Email is required";
-    if (!values.role) errors.role = "Choose role";
-    if (!values.password && !values.id)
-        errors.password = "Password is required";
-
-    return errors;
-};
+import UsersTable from "./UsersTable";
+import GroupsTable from "./GroupsTable";
+import UserFormModal from "./AdminCreateEditUser";
+import {getAllGroups} from "../api/adminGroupApi";
+import GroupFormModal from "./AdminCreateEditGroups";
 
 export default function WorkWithUsersModal({ isOpen, onClose }) {
     const [users, setUsers] = useState([]);
+    const [groups, setGroups] = useState([]);
     const [mode, setMode] = useState("list"); // list | create | edit
+    const [activeTab, setActiveTab] = useState("users"); // users | groups
     const [selectedUser, setSelectedUser] = useState(null);
+    const [selectedGroup, setSelectedGroup] = useState(null);
 
     useEffect(() => {
         if (isOpen) {
-            getAllUsers().then(setUsers);
-            console.log(getAllUsers());
-            setMode("list");
+            loadUsers();
+            loadGroups();
         }
     }, [isOpen]);
 
-    const formik = useFormik({
-        enableReinitialize: true,
-        initialValues: {
-            id: selectedUser?.id || "",
-            userName: selectedUser?.userName || "",
-            email: selectedUser?.email || "",
-            password: "",
-            role: selectedUser?.role || ""
-        },
-        validate,
-        onSubmit: async (values, { resetForm }) => {
-            try {
-                if (mode === "create") {
-                    const created = await createUser(JSON.stringify({
-                        values
-                    }));
-                    setUsers(prev => [...prev, created]);
-                }
+    const loadUsers = async () => {
+        const data = await getAllUsers();
+        setUsers(data);
+    };
 
-                if (mode === "edit") {
-                    await editUser(values.id, values);
-                    setUsers(prev =>
-                        prev.map(u => u.id === values.id ? { ...u, ...values } : u)
-                    );
-                }
-
-                resetForm();
-                setMode("list");
-                setSelectedUser(null);
-            } catch (err) {
-                console.error(err.message);
-            }
-        }
-    });
+    const loadGroups = async () => {
+        const data = await getAllGroups();
+        setGroups(data);
+    };
 
     const handleDelete = async (id) => {
         if (!window.confirm("Удалить пользователя?")) return;
@@ -82,127 +43,96 @@ export default function WorkWithUsersModal({ isOpen, onClose }) {
         setUsers(prev => prev.filter(u => u.id !== id));
     };
 
+    const handleDeleteGroup = async (id) => {
+        if (!window.confirm("Удалить группу?")) return;
+        //await deleteGroup(id);
+        setGroups(prev => prev.filter(g => g.id !== id));
+    };
+
     if (!isOpen) return null;
 
     return (
-        <div className="admin-modal-overlay" onClick={onClose}>
+        <div className="admin-modal-overlay">
             <div className="admin-modal-window" onClick={e => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2>Управление пользователями</h2>
-                    <button className="close-btn" onClick={onClose}> X </button>
-                </div>
-                {mode === "list" && (
-                    <div className="users-layout">
-                        <table className="users-table">
-                            <thead>
-                            <tr>
-                                <th>Username</th>
-                                <th>Email</th>
-                                <th>Role</th>
-                                <th>
-                                    <button
-                                        className="add-btn"
-                                        onClick={() => {
-                                            setSelectedUser(null);
-                                            setMode("create");
-                                        }}
-                                    >
-                                        +
-                                    </button>
-                                </th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {users.map(user => {
-                                const isCurrentUser = user.email === getEmail();
-                                return (
-                                    <tr key={user.id}>
-                                        <td>{user.userName}</td>
-                                        <td>{user.email}</td>
-                                        <td>{user.role}</td>
-                                        <td>
-                                            {isCurrentUser ? (
-                                                "хихи, это ты, чмоня"
-                                            ) : (
-                                                <>
-                                                    <button
-                                                        className="action-btn"
-                                                        onClick={() => {
-                                                            setSelectedUser(user);
-                                                            console.log(user);
-                                                            setMode("edit");
-                                                        }}
-                                                    >
-                                                        ✎
-                                                    </button>
-                                                    <button
-                                                        className="action-btn"
-                                                        onClick={() => handleDelete(user.id)}
-                                                    >
-                                                        🗑
-                                                    </button>
-                                                </>
-                                            )}
-                                        </td>
-                                    </tr>
-                                );
-                            })}
-                            </tbody>
-                        </table>
-                    </div>
-                )}
-
-                {(mode === "create" || mode === "edit") && (
-                    <form className="modal-form" onSubmit={formik.handleSubmit}>
-                        <input
-                            type="text"
-                            name="userName"
-                            placeholder="Username"
-                            value={formik.values.userName}
-                            onChange={formik.handleChange}
-                        />
-
-                        <input
-                            type="text"
-                            name="email"
-                            placeholder="Email"
-                            value={formik.values.email}
-                            onChange={formik.handleChange}
-                        />
-
-                        {(mode === "create") && (
-                            <input
-                                name="password"
-                                placeholder="Password"
-                                type="password"
-                                onChange={formik.handleChange}
-                            />
-                        )}
-
-                        <Select
-                            options={roles}
-                            placeholder="Выберите роль..."
-                            value={roles.find((r) => r.value === formik.values.role)}
-                            onChange={(option) =>
-                                formik.setFieldValue("role", option?.value || "")
-                            }
-                            classNamePrefix="rs"
-                        />
-
-                        <div className="modal-buttons">
-                            <button type="submit" className="save-btn">
-                                {mode === "create" ? "Создать" : "Сохранить"}
-                            </button>
+                    {!(mode === "create" || mode === "edit") && (
+                        <div className="admin-tabs">
                             <button
-                                type="button"
-                                className="action-btn"
-                                onClick={() => setMode("list")}
+                                className={activeTab === "users" ? "tab active" : "tab"}
+                                onClick={() => setActiveTab("users")}
                             >
-                                Назад
+                                Пользователи
+                            </button>
+
+                            <button
+                                className={activeTab === "groups" ? "tab active" : "tab"}
+                                onClick={() => setActiveTab("groups")}
+                            >
+                                Группы
                             </button>
                         </div>
-                    </form>
+                    )}
+                    <button className="close-btn" onClick={() => mode==='list' ? onClose() : setMode('list')}> X </button>
+                </div>
+                {mode === "list" && activeTab === "users" && (
+                    <UsersTable
+                        users={users}
+                        onCreate={() => {
+                            setSelectedUser(null);
+                            setMode("create");
+                        }}
+                        onEdit={(user) => {
+                            setSelectedUser(user);
+                            setMode("edit");
+                        }}
+                        onDelete={handleDelete}
+                    />
                 )}
+
+                {mode === "list" && activeTab === "groups" && (
+                    <GroupsTable
+                        groups={groups}
+                        onCreate={() => {
+                            setSelectedGroup(null);
+                            setMode("create");
+                        }}
+
+                        onEdit={(group) => {
+                            setSelectedGroup(group);
+                            setMode("edit");
+                        }}
+
+                        onDelete={handleDeleteGroup}
+                    />
+                )}
+
+                {(mode === "create" || mode === "edit") && activeTab==='users' && (
+                    <UserFormModal
+                        mode={mode}
+                        selectedUser={selectedUser}
+                        onSuccess={() => {
+                            loadUsers();
+                            setMode("list");
+                            setSelectedUser(null);
+                        }}
+                        onBack={() => setMode("list")}
+                    />
+                )}
+
+                {(mode === "create" || mode === "edit") && activeTab==='groups' && (
+                    <GroupFormModal
+                        mode={mode}
+                        selectedGroup={selectedGroup}
+                        users={users}
+                        onSuccess={() => {
+                            loadGroups();
+                            setMode("list");
+                            setSelectedGroup(null);
+                        }}
+                        onBack={() => setMode("list")}
+                    />
+                )}
+
             </div>
         </div>
     );

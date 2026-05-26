@@ -2,27 +2,31 @@
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
+    width: 100vw;
     height: 100%;
     background: rgba(0, 0, 0, 0.4);
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000;
+    z-index: 100;
 }
 
 .modal-window {
+    margin-top: 10px;
     position: relative;
     background: white;
-    border-radius: 12px;
+    border-radius: 8px;
     padding: 32px 24px;
     width: fit-content;
+    height: fit-content;
+    max-height: 90vh;
     max-width: 40%;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     animation: scaleIn 0.2s ease;
     display: flex;
     flex-direction: column;
     align-items: center;
+    overflow-y: auto;
 }
 
 .modal-window h2 {
@@ -38,6 +42,7 @@
     gap: 16px;
     width: fit-content;
     text-align: left;
+    margin-top: 10px;
 }
 
 .modal-buttons {
@@ -66,16 +71,16 @@
     border: 1px solid #ccc;
     outline: none;
     box-sizing: border-box;
+    margin-bottom: 5px;
 }
 
 .modal-form input:focus,
 .modal-form textarea:focus,
 .rs__control--is-focused {
-    border-color: #E35B91 !important;
-    box-shadow: 0 0 0 1px #E35B91 !important;
+    border-color: #E35B91;
+    box-shadow: 0 0 0 1px #E35B91;
 }
 
-/* Поле описания — увеличенное */
 .modal-form textarea {
     width: 100%;
     padding: 10px 12px;
@@ -131,4 +136,24 @@
     cursor: pointer;
     margin-bottom: 10px;
 }
+
+.check-form {
+    display: flex;
+    gap: 8px;
+    align-content: center;
+}
+
+input[type="checkbox"] {
+    accent-color: #E35B91;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    margin: 0;
+}
+
+.modal-form input[type="checkbox"]:focus {
+    border: none;
+    box-shadow: none;
+}
+
 

@@ -49,7 +49,7 @@ export const BookmarksPanel = ({ bookmarks, onSelect, onDelete, onUpdate }) => {
     return (
         <div className="bookmark-panel">
             <div>
-                <button className="save-btn">New group + </button>
+                <button className="save-btn">New group</button>
             </div>
 
             {bookmarks.length === 0 && (

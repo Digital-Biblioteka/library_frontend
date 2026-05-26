@@ -96,6 +96,7 @@ export default function BooksList() {
                                     id = {book.id}
                                     book = {book}
                                     onClick = {() => handleBookClick(book)}
+                                    isRatingViewed={true}
                                 />
                             ))
                         )

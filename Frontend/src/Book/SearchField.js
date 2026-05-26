@@ -100,7 +100,6 @@ function SearchField() {
 
                 <button className="search-btn" onClick={handleSearch}>
                     <IconSearch size={16} color="currentColor" style={{marginRight: 6, verticalAlign: 'middle'}} />
-                    Поиск
                 </button>
 
             </div>

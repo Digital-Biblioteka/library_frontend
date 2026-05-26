@@ -27,6 +27,11 @@ export default function WorkWIthBookModal({ isOpen, onClose }) {
     const fileInputRef = useRef(null);
     const [mode, setMode] = useState("main");
     const [manualMode, setManualMode] = useState(false);
+    const [isPrivate, setIsPrivate] = useState(false);
+
+    const handlePrivateCheckbox = (e) => {
+        setIsPrivate(e.target.checked);
+    };
 
     const formik = useFormik({
         initialValues: {
@@ -81,7 +86,7 @@ export default function WorkWIthBookModal({ isOpen, onClose }) {
     };
 
     return (
-        <div className="modal-overlay" onClick={onClose}>
+        <div className="modal-overlay">
             <div className="modal-window"
                 onClick={(e) => e.stopPropagation()}>
                 {mode === "main" && (
@@ -98,7 +103,7 @@ export default function WorkWIthBookModal({ isOpen, onClose }) {
                                     Показать все книги
                                 </button>
                                 <button className="add-btn"
-                                    onClick={() => setMode("add")}>
+                                    onClick={() => {setMode("add"); setManualMode(false)}}>
                                     Добавить книгу
                                 </button>
                             </div>
@@ -132,12 +137,20 @@ export default function WorkWIthBookModal({ isOpen, onClose }) {
                                 <BookForm formik={formik}/>
                             )}
 
+                            <div className="check-form">
+                                <input type="checkbox" onChange={handlePrivateCheckbox}/>
+                                <label>Private</label>
+                            </div>
+
                             <div className="modal-buttons">
                                 <button type="submit" className="save-btn">
                                     Сохранить
                                 </button>
                                 <button type="button" className="action-btn"
-                                    onClick={() => setMode("main")}>
+                                        onClick={() => {
+                                            setMode("main");
+                                            setManualMode(false)
+                                        }}>
                                     Назад
                                 </button>
                             </div>

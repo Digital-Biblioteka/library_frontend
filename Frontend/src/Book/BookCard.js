@@ -4,12 +4,13 @@ import "./book-list.css";
 import {getBookReviews} from "./api/reviewApi";
 import StarRating from "./Stars";
 
-export default function BookCard({ id, book, onClick}) {
+export default function BookCard({ id, book, onClick, isRatingViewed}) {
     const [previewUrl, setPreviewUrl] = useState("");
     const [avgRating, setAvgRating] = useState(0);
 
     useEffect(() => {
         if (!id) return;
+        if (!isRatingViewed) return;
 
         getBookReviews(id).then(reviews => {
             if (reviews.length === 0) return;
@@ -51,13 +52,15 @@ export default function BookCard({ id, book, onClick}) {
             <h3 className="book-title">{book.title}</h3>
             <p className="book-author">{book.author}</p>
 
-            <div className="rating-block">
-                <StarRating value={avgRating} readOnly={true}/>
+            {isRatingViewed && (
+                <div className="rating-block">
+                    <StarRating value={avgRating} readOnly={true}/>
 
-                <span className="rating-number">
+                    <span className="rating-number">
                     {avgRating ? avgRating.toFixed(1) : "—"} / 5
                 </span>
-            </div>
+                </div>
+            )}
         </div>
     );
 }
