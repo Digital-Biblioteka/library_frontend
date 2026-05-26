@@ -98,7 +98,8 @@ export async function getChapByIdx(bookId, spineIdx) {
     const res = await fetch (`${API_BASE}/${bookId}/chapter/${spineIdx}`, {
         method: "GET",
         headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
         }
     })
 

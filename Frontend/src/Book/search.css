@@ -97,3 +97,49 @@
     border-color: #E35B91;
     color: #fff;
 }
+
+.rating-filter-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 8px 0;
+}
+.rating-filter-row label {
+    font-size: 14px;
+    color: #333;
+}
+.rating-filter-row input[type="range"] {
+    width: 100%;
+    cursor: pointer;
+}
+
+.suggest-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 0 0 10px 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    z-index: 100;
+    max-height: 260px;
+    overflow-y: auto;
+    list-style: none;
+    margin: 0;
+    padding: 4px 0;
+}
+
+.suggest-item {
+    padding: 8px 14px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    transition: background 0.15s ease;
+}
+
+.suggest-item:hover,
+.suggest-item.active {
+    background: #f0f0f0;
+    color: #E35B91;
+}

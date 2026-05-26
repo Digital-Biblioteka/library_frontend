@@ -41,6 +41,7 @@ export default function WorkWIthBookModal({ isOpen, onClose }) {
         validate: (values) => validate(values, manualMode),
         onSubmit: async (values, { resetForm }) => {
             try {
+                console.log("[addBook] onSubmit fired, values:", values);
                 const dto = {
                     mode: manualMode ? "manual" : "auto",
                     bookDTO: manualMode
@@ -57,18 +58,22 @@ export default function WorkWIthBookModal({ isOpen, onClose }) {
                 const formData = new FormData();
                 formData.append("file", values.file);
                 formData.append("addBookDTO", JSON.stringify(dto))
+                console.log("[addBook] FormData ready, dto:", dto, "file:", values.file?.name);
 
                 await addBook(formData);
+                console.log("[addBook] upload success");
 
                 resetForm();
                 setMode("main");
                 setManualMode(false);
 
-                fileInputRef.current.value = "";
+                if (fileInputRef.current) {
+                    fileInputRef.current.value = "";
+                }
                 onClose?.();
             } catch (err) {
+                console.error("[addBook] upload FAILED:", err);
                 alert(err.message);
-                console.log(err.message)
             }
         },
     });
