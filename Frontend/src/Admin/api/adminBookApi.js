@@ -1,6 +1,20 @@
 const API_BASE = "http://localhost:8080/api/admin/books";
+const PUBLIC_API = "http://localhost:8080/api/books";
+
+export async function getPublicBooks() {
+    const headers = {};
+    const token = localStorage.getItem("token");
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+    const res = await fetch(PUBLIC_API, { headers });
+    if (!res.ok) {
+        const msg = await res.text();
+        throw new Error(`Не удалось получить список книг: ${msg}`);
+    }
+    return await res.json();
+}
 
 export async function addBook(bookData) {
+    console.log("[addBook API] sending request, token:", localStorage.getItem("token")?.substring(0, 20) + "...");
     const res = await fetch ( `${API_BASE}`, {
         method: "POST",
         headers: {
@@ -8,9 +22,11 @@ export async function addBook(bookData) {
             },
         body: bookData
     });
+    console.log("[addBook API] response status:", res.status);
 
     if (!res.ok) {
         const msg = await res.text();
+        console.error("[addBook API] error response:", msg);
         throw new Error(`Ошибка загрузки книги на сервер: ${msg}`);
     }
 }

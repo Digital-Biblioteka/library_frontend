@@ -120,46 +120,15 @@ const Reader = () => {
         setProgress(global);
     }, [spineIdx, total, html]);
 
-    const highlightTextInBlock = (block, text) => {
-        const walker = document.createTreeWalker(block, NodeFilter.SHOW_TEXT, null);
-        const textNodes = [];
-        while (walker.nextNode()) textNodes.push(walker.currentNode);
-
-        const escaped = text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        const regex = new RegExp(escaped, 'gi');
-
-        for (const node of textNodes) {
-            const val = node.nodeValue;
-            if (!regex.test(val)) continue;
-            regex.lastIndex = 0;
-
-            const frag = document.createDocumentFragment();
-            let lastIdx = 0;
-            let match;
-            while ((match = regex.exec(val)) !== null) {
-                if (match.index > lastIdx) {
-                    frag.appendChild(document.createTextNode(val.slice(lastIdx, match.index)));
-                }
-                const mark = document.createElement('mark');
-                mark.className = 'search-highlight';
-                mark.textContent = match[0];
-                frag.appendChild(mark);
-                lastIdx = regex.lastIndex;
-            }
-            if (lastIdx < val.length) {
-                frag.appendChild(document.createTextNode(val.slice(lastIdx)));
-            }
-            node.parentNode.replaceChild(frag, node);
-        }
+    const highlightBlock = (block) => {
+        block.classList.add('search-highlight-block');
     };
 
     const clearHighlights = () => {
         const container = containerRef.current;
         if (!container) return;
-        container.querySelectorAll('mark.search-highlight').forEach(mark => {
-            const parent = mark.parentNode;
-            parent.replaceChild(document.createTextNode(mark.textContent), mark);
-            parent.normalize();
+        container.querySelectorAll('.search-highlight-block').forEach(el => {
+            el.classList.remove('search-highlight-block');
         });
         container.removeEventListener('click', clearHighlights);
         container.removeEventListener('wheel', clearHighlights);
@@ -235,10 +204,8 @@ const Reader = () => {
                             block.classList.add("bookmark-focus");
                             setTimeout(() => block.classList.remove("bookmark-focus"), 1200);
 
-                            if (searchHighlightText) {
-                                highlightTextInBlock(block, searchHighlightText);
-                                clearHighlightsOnInteraction();
-                            }
+                            highlightBlock(block);
+                            clearHighlightsOnInteraction();
                         }
                     });
                 });
