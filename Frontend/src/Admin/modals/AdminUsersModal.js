@@ -6,11 +6,15 @@ import {
     deleteUser
 } from "../api/adminUsersApi";
 
+import { getAllBooks } from "../api/adminBookApi";
+
 import UsersTable from "./UsersTable";
 import GroupsTable from "./GroupsTable";
 import UserFormModal from "./AdminCreateEditUser";
 import {getAllGroups} from "../api/adminGroupApi";
 import GroupFormModal from "./AdminCreateEditGroups";
+import AdminGroupLimitsModal from "./AdminGroupLimitsModal";
+import AddUserToGroupModal from "./AddUserToGroupModal";
 
 export default function WorkWithUsersModal({ isOpen, onClose }) {
     const [users, setUsers] = useState([]);
@@ -19,11 +23,15 @@ export default function WorkWithUsersModal({ isOpen, onClose }) {
     const [activeTab, setActiveTab] = useState("users"); // users | groups
     const [selectedUser, setSelectedUser] = useState(null);
     const [selectedGroup, setSelectedGroup] = useState(null);
+    const [isLimitsOpen, setIsLimitsOpen] = useState(false);
+    const [isAddUserOpen, setIsAddUserOpen] = useState(false);
+    const [books, setBooks] = useState([]);
 
     useEffect(() => {
         if (isOpen) {
             loadUsers();
             loadGroups();
+            loadBooks();
         }
     }, [isOpen]);
 
@@ -35,6 +43,11 @@ export default function WorkWithUsersModal({ isOpen, onClose }) {
     const loadGroups = async () => {
         const data = await getAllGroups();
         setGroups(data);
+    };
+
+    const loadBooks = async () => {
+        const data = await getAllBooks();
+        setBooks(data);
     };
 
     const handleDelete = async (id) => {
@@ -103,6 +116,14 @@ export default function WorkWithUsersModal({ isOpen, onClose }) {
                         }}
 
                         onDelete={handleDeleteGroup}
+                        onOpenLimits={(group) => {
+                            setSelectedGroup(group);
+                            setIsLimitsOpen(true);
+                        }}
+                        onAddUser={(group) => {
+                            setSelectedGroup(group);
+                            setIsAddUserOpen(true);
+                        }}
                     />
                 )}
 
@@ -132,6 +153,28 @@ export default function WorkWithUsersModal({ isOpen, onClose }) {
                         onBack={() => setMode("list")}
                     />
                 )}
+
+                <AdminGroupLimitsModal
+                    isOpen={isLimitsOpen}
+                    group={selectedGroup}
+                    onClose={() => {
+                        setIsLimitsOpen(false);
+                        setSelectedGroup(null);
+                        loadGroups();
+                    }}
+                    books={books}
+                />
+
+                <AddUserToGroupModal
+                    isOpen={isAddUserOpen}
+                    group={selectedGroup}
+                    onClose={() => {
+                        setIsAddUserOpen(false);
+                        setSelectedGroup(null);
+                    }}
+                    onSuccess={loadGroups}
+                    users={users}
+                />
 
             </div>
         </div>

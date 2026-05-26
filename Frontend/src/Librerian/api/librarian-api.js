@@ -34,6 +34,22 @@ export async function getGroupUsers(id) {
     return res.json();
 }
 
+export async function getAllUsers() {
+    const res = await fetch(`${API_BASE}/users`, {
+        method: "GET",
+        headers: {
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        }
+    });
+
+    if (!res.ok) {
+        const msg = await res.text();
+        console.error(`Ошибка получения пользователей: ${msg}`)
+    }
+
+    return res.json();
+}
+
 
 export async function addUserToGroup(groupId, userEmail) {
     const res = await fetch(`${API_BASE}/librarian/groups/${groupId}`, {
@@ -52,6 +68,24 @@ export async function addUserToGroup(groupId, userEmail) {
 
     return res.json();
 }
+
+export async function getGroupBooksLimits(groupId) {
+    const res = await fetch(`${API_BASE}/librarian/groups/${groupId}/books/limits`, {
+        method: "GET",
+        headers: {
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        }
+    });
+
+    if (!res.ok) {
+        const msg = await res.text();
+        console.error(`Ошибка получения лимитов: ${msg}`)
+    }
+
+    return res.json();
+}
+
+
 
 export async function getAccessRequestsByGroup(groupId) {
     const res = await fetch(`${API_BASE}/librarian/requests/groups/${groupId}`, {

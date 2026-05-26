@@ -52,12 +52,33 @@ export async function upgradeGroup(groupId, groupData) {
     return res.json();
 }
 
+export async function addUserToGroup(groupId, userEmail) {
+    const res = await fetch(`${API_BASE}/${groupId}`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        },
+        body: JSON.stringify({ email: userEmail })
+    });
+
+    if (!res.ok) {
+        const msg = await res.text();
+        console.error(`Ошибка добавления пользователя в группу: ${msg}`)
+    }
+
+    return res.json();
+}
+
 //-------------------------------------------------------------BOOK LIMITS-----------------------------------------------------------
 
 export async function giveBookLimits(groupId, bookLim) {
-    const res = await fetch(`${API_BASE}/${groupId}/book/limits`, {
+    console.log(bookLim)
+
+    const res = await fetch(`${API_BASE}/${groupId}/books/limits`, {
         method: "POST",
         headers: {
+            "Content-Type": "application/json",
             "Authorization": `Bearer ${localStorage.getItem("token")}`
         },
         body: JSON.stringify(bookLim)
@@ -72,7 +93,7 @@ export async function giveBookLimits(groupId, bookLim) {
 }
 
 export async function getBookLimits(groupId) {
-    const res = await fetch(`${API_BASE}/${groupId}/book/limits`, {
+    const res = await fetch(`${API_BASE}/${groupId}/books/limits`, {
         method: "GET",
         headers: {
             "Authorization": `Bearer ${localStorage.getItem("token")}`
@@ -88,9 +109,10 @@ export async function getBookLimits(groupId) {
 }
 
 export async function updateBookLimits(bookLimId, bookLim) {
-    const res = await fetch(`${API_BASE}/book/limits/${bookLimId}`, {
+    const res = await fetch(`${API_BASE}/books/limits/${bookLimId}`, {
         method: "PUT",
         headers: {
+            "Content-Type": "application/json",
             "Authorization": `Bearer ${localStorage.getItem("token")}`
         },
         body: JSON.stringify(bookLim)
@@ -119,4 +141,106 @@ export async function getAllBookLimits() {
 
     return res.json();
 }
+//-------------------------------------------------------------BOOK LIMIT REQUESTS-----------------------------------------------------------
 
+export async function getAllLimitRequests() {
+    const res = await fetch(`${API_BASE}/limits/requests`, {
+        method: "GET",
+        headers: {
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        },
+    });
+
+    if (!res.ok) {
+        const msg = await res.text();
+        console.error(`Ошибка получения запросов на лимиты: ${msg}`)
+    }
+
+    return res.json();
+}
+
+export async function approveLimitRequest(requestId) {
+    const res = await fetch(`${API_BASE}/limits/requests/${requestId}/approve`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        }
+    });
+
+    if (!res.ok) {
+        const msg = await res.text();
+        console.error(`Ошибка одобрения запроса на лимит: ${msg}`)
+    }
+
+    return res.json();
+}
+
+export async function rejectLimitRequest(requestId) {
+    const res = await fetch(`${API_BASE}/limits/requests/${requestId}/reject`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        }
+    });
+
+    if (!res.ok) {
+        const msg = await res.text();
+        console.error(`Ошибка отклонения запроса на лимит: ${msg}`)
+    }
+
+    return res.json();
+}
+
+//-------------------------------------------------------------CATEGORY LIMIT REQUESTS-----------------------------------------------------------
+
+export async function getAllCategoryLimitRequests() {
+    const res = await fetch(`${API_BASE}/categories/limits/requests`, {
+        method: "GET",
+        headers: {
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        },
+    });
+
+    if (!res.ok) {
+        const msg = await res.text();
+        console.error(`Ошибка получения запросов на лимиты категорий: ${msg}`)
+    }
+
+    return res.json();
+}
+
+export async function approveCategoryLimitRequest(requestId) {
+    const res = await fetch(`${API_BASE}/categories/limits/requests/${requestId}/approve`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        }
+    });
+
+    if (!res.ok) {
+        const msg = await res.text();
+        console.error(`Ошибка одобрения запроса на лимит категории: ${msg}`)
+    }
+
+    return res.json();
+}
+
+export async function rejectCategoryLimitRequest(requestId) {
+    const res = await fetch(`${API_BASE}/categories/limits/requests/${requestId}/reject`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        }
+    });
+
+    if (!res.ok) {
+        const msg = await res.text();
+        console.error(`Ошибка отклонения запроса на лимит категории: ${msg}`)
+    }
+
+    return res.json();
+}

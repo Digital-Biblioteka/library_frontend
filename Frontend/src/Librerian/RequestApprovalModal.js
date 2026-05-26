@@ -58,7 +58,7 @@ export default function RequestsApprovalModal({
                                         </button>
                                     )}
                                     <button className="primary-btn" onClick={() => onApprove(request.id)}>
-                                        Апрув
+                                        approve
                                     </button>
                                 </div>
                             </div>

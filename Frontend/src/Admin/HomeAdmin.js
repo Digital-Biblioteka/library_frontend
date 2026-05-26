@@ -5,11 +5,13 @@ import "../buttons.css"
 import WorkWIthBookModal from "./modals/AdminAddBookModal";
 import {useState} from "react";
 import WorkWithUsersModal from "./modals/AdminUsersModal";
+import AdminRequestsModal from "./modals/AdminRequestsModal";
 
 export default function HomeAdmin() {
     const username = getUsername();
     const [isBookModalOpen, setIsBookModalOpen] = useState(false);
     const [isUserModalOpen, setIsUserModalOpen] = useState(false)
+    const [isRequestsModalOpen, setIsRequestsModalOpen] = useState(false)
 
     return (
         <div className="Home">
@@ -19,7 +21,7 @@ export default function HomeAdmin() {
 
                     <div className="buttons-party">
                         <button className="logout-btn"
-                            onClick={logout}>
+                                onClick={logout}>
                             Выйти
                         </button>
                     </div>
@@ -28,12 +30,16 @@ export default function HomeAdmin() {
                 <div className="admin-panel">
                     <label className="label" >Панель администратора</label>
                     <button className="admin-button"
-                        onClick={() => setIsBookModalOpen(true)}>
+                            onClick={() => setIsBookModalOpen(true)}>
                         Управление книгами
                     </button>
                     <button className="admin-button"
                             onClick={() => setIsUserModalOpen(true)}>
                         Управление пользователями
+                    </button>
+                    <button className="admin-button"
+                            onClick={() => setIsRequestsModalOpen(true)}>
+                        Запросы на лимиты
                     </button>
                 </div>
 
@@ -45,6 +51,11 @@ export default function HomeAdmin() {
                 <WorkWithUsersModal
                     isOpen={isUserModalOpen}
                     onClose={() => setIsUserModalOpen(false)}
+                />
+
+                <AdminRequestsModal
+                    isOpen={isRequestsModalOpen}
+                    onClose={() => setIsRequestsModalOpen(false)}
                 />
             </div>
         </div>

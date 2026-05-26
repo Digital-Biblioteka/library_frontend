@@ -1,15 +1,14 @@
 import React from "react";
 import BookCard from "../Book/BookCard";
 
-export default function BooksGroupList({ books = [], onClose, onRequestLimit }) {
+export default function BooksGroupList({ books, onClose, onRequestLimit }) {
     return (
         <section className="content-card">
             <div className="section-header">
                 <div>
                     <h2>Книги группы</h2>
-                    <p>Список книг и доступных лимитов</p>
                 </div>
-                <button className="secondary-btn" onClick={onClose}>Назад к пользователям</button>
+                <button className="action-btn" onClick={onClose}>Назад к пользователям</button>
             </div>
 
             {books.length === 0 ? (

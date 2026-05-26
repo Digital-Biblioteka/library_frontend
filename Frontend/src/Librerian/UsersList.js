@@ -10,18 +10,17 @@ export default function UsersList({ users = [], onShowUserRequests }) {
             <div className="section-header">
                 <div>
                     <h2>Пользователи группы</h2>
-                    <p>Управление запросами пользователей</p>
                 </div>
             </div>
 
             <div className="users-layout">
                 <table className="users-table">
                     <thead>
-                    <tr>
-                        <th>Username</th>
-                        <th>Email</th>
-                        <th>Requests</th>
-                    </tr>
+                        <tr>
+                            <th>Имя</th>
+                            <th>Email</th>
+                            <th>Запросы</th>
+                        </tr>
                     </thead>
                     <tbody>
                     {users.length === 0 ? (

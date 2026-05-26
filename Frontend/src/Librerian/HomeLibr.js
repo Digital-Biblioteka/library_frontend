@@ -20,7 +20,7 @@ import {
     getCategoryAccessRequestsByGroup,
     getCategoryLimitRequestsByGroup,
     getGroupUsers,
-    rejectCategoryAccessRequest
+    rejectCategoryAccessRequest, getGroupBooksLimits
 } from "./api/librarian-api";
 
 export default function HomeLibr() {
@@ -30,12 +30,13 @@ export default function HomeLibr() {
     const [users, setUsers] = useState([]);
     const [selectedGroup, setSelectedGroup] = useState(null);
     const [mode, setMode] = useState("groups");
+    const [books, setBooks] = useState([]);
+    const [allUsers, setAllUsers] = useState([]);
 
     const [bookRequests, setBookRequests] = useState([]);
     const [categoryRequests, setCategoryRequests] = useState([]);
     const [bookLimitRequests, setBookLimitRequests] = useState([]);
     const [categoryLimitRequests, setCategoryLimitRequests] = useState([]);
-
     const [isAddUserOpen, setIsAddUserOpen] = useState(false);
     const [requestsModal, setRequestsModal] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -71,12 +72,19 @@ export default function HomeLibr() {
     }
 
     async function loadGroupData(group) {
-        const [usersData, bookReq, categoryReq, bookLimits, categoryLimits] = await Promise.all([
+        const [
+            usersData,
+            bookReq,
+            categoryReq,
+            bookLimits,
+            categoryLimits,
+            allBooks] = await Promise.all([
             getGroupUsers(group.id),
             getAccessRequestsByGroup(group.id),
             getCategoryAccessRequestsByGroup(group.id),
             getLimitRequestsByGroup(group.id),
-            getCategoryLimitRequestsByGroup(group.id)
+            getCategoryLimitRequestsByGroup(group.id),
+            getGroupBooksLimits(group.id)
         ]);
 
         setUsers(usersData || []);
@@ -84,6 +92,7 @@ export default function HomeLibr() {
         setCategoryRequests(categoryReq || []);
         setBookLimitRequests(bookLimits || []);
         setCategoryLimitRequests(categoryLimits || []);
+        setBooks(allBooks || []);
     }
 
     const handleGroupSelect = async (group) => {
@@ -199,7 +208,6 @@ export default function HomeLibr() {
                         <>
                             <div className="selected-group-bar">
                                 <div>
-                                    <span className="muted">Текущая группа</span>
                                     <strong>{selectedGroup.name}</strong>
                                 </div>
                                 <div className="lib-actions">
@@ -212,10 +220,10 @@ export default function HomeLibr() {
                             </div>
 
                             <div className="request-shortcuts">
-                                <button className="request-chip" onClick={() => openRequests("book")}>
+                                <button className="add-btn" onClick={() => openRequests("book")}>
                                     Запросы книг: {bookRequests.length}
                                 </button>
-                                <button className="request-chip" onClick={() => openRequests("category")}>
+                                <button className="add-btn" onClick={() => openRequests("category")}>
                                     Запросы категорий: {categoryRequests.length}
                                 </button>
                             </div>
@@ -227,7 +235,10 @@ export default function HomeLibr() {
                     )}
 
                     {mode === "books" && (
-                        <BooksGroupList books={[]} onClose={() => setMode("users")} />
+                        <BooksGroupList
+                            books={books}
+                            onClose={() => setMode("users")}
+                        />
                     )}
 
                     {mode === "limits" && selectedGroup && (

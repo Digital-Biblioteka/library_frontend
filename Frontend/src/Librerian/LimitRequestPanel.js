@@ -38,7 +38,7 @@ export default function LimitRequestsPanel({
                 <input
                     value={bookForm.bookID}
                     onChange={(e) => setBookForm({ ...bookForm, bookID: e.target.value })}
-                    placeholder="Book UUID"
+                    placeholder="Book"
                     required
                 />
                 <input
@@ -49,7 +49,7 @@ export default function LimitRequestsPanel({
                     placeholder="Новый лимит"
                     required
                 />
-                <button className="primary-btn" disabled={isLoading}>Отправить</button>
+                <button className="add-btn" disabled={isLoading}>Отправить</button>
             </form>
 
             <form className="limit-form" onSubmit={submitCategory}>
@@ -57,7 +57,7 @@ export default function LimitRequestsPanel({
                 <input
                     value={categoryForm.categoryID}
                     onChange={(e) => setCategoryForm({ ...categoryForm, categoryID: e.target.value })}
-                    placeholder="Category UUID"
+                    placeholder="Category"
                     required
                 />
                 <input
@@ -68,7 +68,7 @@ export default function LimitRequestsPanel({
                     placeholder="Новый лимит"
                     required
                 />
-                <button className="primary-btn" disabled={isLoading}>Отправить</button>
+                <button className="add-btn" disabled={isLoading}>Отправить</button>
             </form>
 
             <div className="requests-table-card">

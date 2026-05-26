@@ -5,7 +5,9 @@ export default function GroupsTable({
                                         groups,
                                         onCreate,
                                         onEdit,
-                                        onDelete
+                                        onDelete,
+                                        onOpenLimits,
+                                        onAddUser
                                     }) {
 
     const [groupLimits, setGroupLimits] = useState([]);
@@ -65,10 +67,13 @@ export default function GroupsTable({
                     return(
                         <tr key={group.id}>
                             <td>{group.name}</td>
-                            <td>{group.librarian?.username}</td>
+                            <td>{group.librarian?.username || group.librarian?.userName}</td>
                             <td>{group.description}</td>
                             <td>
-                                <button className="action-btn">
+                                <button
+                                    className="action-btn"
+                                    onClick={() => onOpenLimits(group)}
+                                >
                                     {hasLimits
                                         ? "Open Limits"
                                         : "Add Limits"}
@@ -89,7 +94,10 @@ export default function GroupsTable({
                                     🗑
                                 </button>
 
-                                <button className="add-btn">
+                                <button
+                                    className="add-btn"
+                                    onClick={() => onAddUser(group)}
+                                >
                                     +
                                 </button>
                             </td>
