@@ -1,7 +1,7 @@
-const API_BASE = "http://localhost:8080/api/admin/users"
+const API_BASE = "http://localhost:8080/api"
 
 export async function getAllUsers () {
-    const res = await fetch(`${API_BASE}`, {
+    const res = await fetch(`${API_BASE}/users`, {
         method: "GET",
         headers: {
             "Authorization": `Bearer ${localStorage.getItem("token")}`
@@ -18,7 +18,7 @@ export async function getAllUsers () {
 
 //недоделано требует проверки
 export async function createUser (userData) {
-    const res = await fetch(`${API_BASE}`, {
+    const res = await fetch(`${API_BASE}/admin/users`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -36,7 +36,7 @@ export async function createUser (userData) {
 }
 
 export async function deleteUser(id) {
-    const res = await fetch(`${API_BASE}/${id}`, {
+    const res = await fetch(`${API_BASE}/admin/users/${id}`, {
         method: "DELETE",
         headers: {
             "Authorization": `Bearer ${localStorage.getItem("token")}`,
@@ -51,7 +51,7 @@ export async function deleteUser(id) {
 }
 
 export async function editUser(id, user) {
-    const res = await fetch(`${API_BASE}/${id}`, {
+    const res = await fetch(`${API_BASE}/admin/users/${id}`, {
         method: "PUT",
         headers: {
             "Content-Type": "application/json",

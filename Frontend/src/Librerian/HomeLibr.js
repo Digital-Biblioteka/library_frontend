@@ -20,7 +20,7 @@ import {
     getCategoryAccessRequestsByGroup,
     getCategoryLimitRequestsByGroup,
     getGroupUsers,
-    rejectCategoryAccessRequest, getGroupBooksLimits
+    rejectCategoryAccessRequest, getGroupBooksLimits, getAllUsers
 } from "./api/librarian-api";
 
 export default function HomeLibr() {
@@ -49,6 +49,8 @@ export default function HomeLibr() {
 
     useEffect(() => {
         loadGroups();
+        loadUsers();
+
     }, []);
 
     async function run(action) {
@@ -70,6 +72,14 @@ export default function HomeLibr() {
             setGroups(data || []);
         });
     }
+
+    async function loadUsers() {
+        await run(async () => {
+            const data = await getAllUsers();
+            setAllUsers(data || []);
+        });
+    }
+
 
     async function loadGroupData(group) {
         const [
@@ -260,6 +270,7 @@ export default function HomeLibr() {
                 onClose={() => setIsAddUserOpen(false)}
                 onSubmit={handleAddUser}
                 isLoading={isLoading}
+                users={allUsers}
             />
 
             <RequestsApprovalModal

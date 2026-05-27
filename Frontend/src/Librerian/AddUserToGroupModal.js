@@ -1,10 +1,16 @@
 import React, { useState } from "react";
+import Select from "react-select";
 
-export default function AddUserToGroupModal({ isOpen, groupName, onClose, onSubmit, isLoading }) {
+export default function AddUserToGroupModal({ isOpen, groupName, onClose, onSubmit, isLoading, users }) {
     const [email, setEmail] = useState("");
     const [error, setError] = useState("");
 
     if (!isOpen) return null;
+
+    const userOptions = users.map(user => ({
+        value: user.email,
+        label: user.email
+    }));
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -33,12 +39,14 @@ export default function AddUserToGroupModal({ isOpen, groupName, onClose, onSubm
 
                 <label className="form-field">
                     <span>Email пользователя</span>
-                    <input
-                        type="email"
+
+                    <Select
+                        options={userOptions}
                         value={email}
+                        placeholder="Выберите email пользователя"
                         onChange={(e) => setEmail(e.target.value)}
-                        placeholder="user@example.com"
-                        autoFocus
+                        classNamePrefix="rs"
+                        isSearchable={true}
                     />
                 </label>
 
