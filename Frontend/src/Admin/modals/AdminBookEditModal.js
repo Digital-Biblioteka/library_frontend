@@ -1,6 +1,6 @@
 import "../../User(Home pages)/modal-window.css"
 import {useNavigate} from "react-router-dom";
-import {deleteBook, editBook} from "../api/adminBookApi";
+import {deleteBook, editBook, reindexBook} from "../api/adminBookApi";
 import React, {useState} from "react";
 import {useFormik} from "formik";
 import {openBook} from "../../Book/api/readerApi";
@@ -9,6 +9,15 @@ import BookForm from "../form/BookForm";
 export default function AdminEditorModal({ isOpen, onClose, book, onBookUpdated, onBookDeleted }) {
     const navigate = useNavigate();
     const [mode, setMode] = useState("main");
+
+    const handleReindex = async () => {
+        if (!book?.id) return;
+        try {
+            await reindexBook(book.id);
+        } catch (err) {
+            console.error("Reindex failed:", err);
+        }
+    };
 
     const formik = useFormik({
         enableReinitialize: true,
@@ -74,6 +83,7 @@ export default function AdminEditorModal({ isOpen, onClose, book, onBookUpdated,
                     <>
                         <h2>Редактировать книгу</h2>
                         <button className="close-btn" onClick={onClose}> X </button>
+
                         <div className="modal-buttons">
                             <button className="add-btn" onClick={() => setMode("edit")}>
                                 Редактировать

@@ -3,14 +3,14 @@ import { useNavigate } from "react-router-dom";
 import "./search.css";
 import "../buttons.css"
 import AdvancedSearchForm from "./SearchForm";
-import { IconBook, IconQuote, IconSearch } from "./Icons";
+import { IconBook, IconQuote, IconSearch, IconBrain } from "./Icons";
 import { suggestBook } from "./api/searchApi";
 
 function SearchField() {
     const navigate = useNavigate();
     const [searchValue, setSearchValue] = useState("");
     const [showAdvanced, setShowAdvanced] = useState(false);
-    const [searchMode, setSearchMode] = useState("metadata"); // "metadata" | "quote"
+    const [searchMode, setSearchMode] = useState("metadata"); // "metadata" | "quote" | "semantic"
 
     const [advancedValues, setAdvancedValues] = useState({
         title: null,
@@ -74,6 +74,15 @@ function SearchField() {
             return;
         }
 
+        if (searchMode === "semantic") {
+            const queryObject = {
+                query: searchValue || null
+            };
+            const encoded = encodeURIComponent(JSON.stringify(queryObject));
+            navigate(`/book-list?query=${plainQuery}&semanticSearch=${encoded}`);
+            return;
+        }
+
         const queryObject = {
             query: searchValue || null,
             title: advancedValues.title,
@@ -110,7 +119,7 @@ function SearchField() {
             <div className="search-container">
                 <div className="search-input-wrapper" ref={suggestRef}>
                     <input
-                        placeholder={searchMode === "quote" ? "ищу цитату..." : "я ищу..."}
+                        placeholder={searchMode === "quote" ? "ищу цитату..." : searchMode === "semantic" ? "поиск по смыслу..." : "я ищу..."}
                         className="search-field"
                         value={searchValue}
                         onChange={(e) => setSearchValue(e.target.value)}
@@ -128,7 +137,6 @@ function SearchField() {
                         ⚙
                     </button>
 
-                    {/* выпадающий список автодополнения */}
                     {showSuggest && (
                         <div className="suggest-dropdown">
                             {suggestions.map((s, i) => (
@@ -165,6 +173,13 @@ function SearchField() {
                         title="Поиск по цитате"
                     >
                         <IconQuote size={16} color={searchMode === "quote" ? "#fff" : "#555"} />
+                    </button>
+                    <button
+                        className={`mode-btn ${searchMode === "semantic" ? "active" : ""}`}
+                        onClick={() => setSearchMode("semantic")}
+                        title="Поиск по смыслу"
+                    >
+                        <IconBrain size={16} color={searchMode === "semantic" ? "#fff" : "#555"} />
                     </button>
                 </div>
 

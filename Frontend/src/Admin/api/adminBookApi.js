@@ -29,6 +29,9 @@ export async function addBook(bookData) {
         console.error("[addBook API] error response:", msg);
         throw new Error(`Ошибка загрузки книги на сервер: ${msg}`);
     }
+
+    const data = await res.json();
+    return data;
 }
 
 export async function getAllBooks() {
@@ -95,4 +98,53 @@ export async function editBook(id, book) {
 
     const data = await res.json();
     console.log(data);
+}
+
+export async function getIndexingStatus(id) {
+    const res = await fetch(`${API_BASE}/${id}/indexing-status`, {
+        method: "GET",
+        headers: {
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        }
+    });
+
+    if (!res.ok) {
+        const msg = await res.text();
+        console.error(`Ошибка получения статуса индексации: ${msg}`);
+        return null;
+    }
+
+    return await res.text();
+}
+
+export async function reindexBook(id) {
+    const res = await fetch(`${API_BASE}/${id}/reindex`, {
+        method: "POST",
+        headers: {
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        }
+    });
+
+    if (!res.ok) {
+        const msg = await res.text();
+        console.error(`Ошибка переиндексации: ${msg}`);
+        throw new Error(`Ошибка переиндексации: ${msg}`);
+    }
+}
+
+export async function reindexAllBooks() {
+    const res = await fetch(`${API_BASE}/reindex-all`, {
+        method: "POST",
+        headers: {
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        }
+    });
+
+    if (!res.ok) {
+        const msg = await res.text();
+        console.error(`Ошибка массовой переиндексации: ${msg}`);
+        throw new Error(`Ошибка массовой переиндексации: ${msg}`);
+    }
+
+    return await res.text();
 }

@@ -20,3 +20,9 @@ export const IconSearch = ({ size = 18, color = "currentColor" }) => (
         <line x1="21" y1="21" x2="16.65" y2="16.65" />
     </svg>
 );
+
+export const IconBrain = ({ size = 18, color = "currentColor" }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.272 0l-.839.84A7 7 0 019 15.143l-.839-.84z" />
+    </svg>
+);

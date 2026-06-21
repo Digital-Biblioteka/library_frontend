@@ -5,7 +5,7 @@ import "./book-list.css";
 import AdminEditorModal from "../Admin/modals/AdminBookEditModal";
 import {getRole} from "../Auth/utils/AuthToken";
 import SearchField from "./SearchField";
-import {searchBook} from "./api/searchApi";
+import {searchBook, semanticSearch} from "./api/searchApi";
 import {searchContent} from "./api/contentSearchApi";
 import UserBookModal from "../User(Home pages)/UserBookModal";
 import BookCard from "./BookCard";
@@ -24,13 +24,21 @@ export default function BooksList() {
     const query = searchParams.get("query");
     const params = searchParams.get("search");
     const contentQuery = searchParams.get("contentSearch");
+    const semanticParams = searchParams.get("semanticSearch");
 
     const isContentSearch = !!contentQuery;
+    const isSemanticSearch = !!semanticParams;
 
     useEffect(() => {
         if (contentQuery) {
             searchContent(contentQuery).then(setContentResults).catch(console.error);
             setBooks([]);
+        } else if (semanticParams) {
+            semanticSearch(semanticParams).then(async (loadedBooks) => {
+                setBooks(loadedBooks);
+                console.log(loadedBooks)
+            }).catch(console.error);
+            setContentResults([]);
         } else if (params) {
             searchBook(params).then(async (loadedBooks) => {
                 setBooks(loadedBooks);
@@ -43,7 +51,7 @@ export default function BooksList() {
                 setBooks(loadedBooks);
             }).catch(console.error);
         }
-    }, [params, contentQuery]);
+    }, [params, contentQuery, semanticParams]);
 
     const handleBookClick = (book) => {
         setSelectedBook(book);
@@ -121,6 +129,7 @@ export default function BooksList() {
                                     book = {book}
                                     onClick = {() => handleBookClick(book)}
                                     isRatingViewed={true}
+                                    showIndexingStatus={getRole() === "ROLE_ADMIN"}
                                 />
                             ))
                         )

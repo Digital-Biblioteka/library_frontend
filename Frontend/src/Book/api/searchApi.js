@@ -1,4 +1,5 @@
 const API_BASE = "http://localhost:8080/api/search/books";
+const API_SEMANTIC = "http://localhost:8080/api/search/books/semantic";
 const SUGGEST_BASE = "http://localhost:8080/api/search/suggest";
 
 export async function searchBook(params) {
@@ -13,6 +14,23 @@ export async function searchBook(params) {
     if (!res.ok) {
         const msg = await res.text();
         console.error(`Ошибка поиска книг: ${msg}`);
+    }
+
+    return await res.json();
+}
+
+export async function semanticSearch(params) {
+    const res = await fetch(`${API_SEMANTIC}`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: params
+    });
+
+    if (!res.ok) {
+        const msg = await res.text();
+        console.error(`Ошибка семантического поиска: ${msg}`);
     }
 
     return await res.json();

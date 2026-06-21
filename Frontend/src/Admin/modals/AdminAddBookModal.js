@@ -1,7 +1,7 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import "../../User(Home pages)/modal-window.css";
 import {useFormik} from "formik";
-import {addBook} from "../api/adminBookApi";
+import {addBook, getIndexingStatus} from "../api/adminBookApi";
 import {useNavigate} from "react-router-dom";
 import SearchField from "../../Book/SearchField";
 import BookForm from "../form/BookForm";
@@ -28,6 +28,8 @@ export default function WorkWIthBookModal({ isOpen, onClose }) {
     const [mode, setMode] = useState("main");
     const [manualMode, setManualMode] = useState(false);
     const [isPrivate, setIsPrivate] = useState(false);
+    const [indexingStatus, setIndexingStatus] = useState(null);
+    const [lastAddedBookId, setLastAddedBookId] = useState(null);
 
     const handlePrivateCheckbox = (e) => {
         setIsPrivate(e.target.checked);
@@ -65,17 +67,19 @@ export default function WorkWIthBookModal({ isOpen, onClose }) {
                 formData.append("addBookDTO", JSON.stringify(dto))
                 console.log("[addBook] FormData ready, dto:", dto, "file:", values.file?.name);
 
-                await addBook(formData);
-                console.log("[addBook] upload success");
+                const createdBook = await addBook(formData);
+                console.log("[addBook] upload success, createdBook:", createdBook);
 
                 resetForm();
-                setMode("main");
                 setManualMode(false);
 
                 if (fileInputRef.current) {
                     fileInputRef.current.value = "";
                 }
-                onClose?.();
+
+                setLastAddedBookId(createdBook.id);
+                setIndexingStatus(createdBook.indexingStatus || "NOT_INDEXED");
+                setMode("indexing");
             } catch (err) {
                 console.error("[addBook] upload FAILED:", err);
                 alert(err.message);
@@ -83,11 +87,38 @@ export default function WorkWIthBookModal({ isOpen, onClose }) {
         },
     });
 
+    useEffect(() => {
+        if (mode !== "indexing" || !lastAddedBookId) return;
+
+        const poll = setInterval(async () => {
+            try {
+                const status = await getIndexingStatus(lastAddedBookId);
+                console.log("[addBook] indexing status:", status);
+                setIndexingStatus(status);
+                if (status !== "INDEXING") {
+                    clearInterval(poll);
+                }
+            } catch (err) {
+                console.error("[addBook] polling status failed:", err);
+                clearInterval(poll);
+            }
+        }, 3000);
+
+        return () => clearInterval(poll);
+    }, [mode, lastAddedBookId]);
+
     if (!isOpen) return null;
 
     const handleFileChange = (e) => {
         const f = e.target.files && e.target.files[0];
         if (f) formik.setFieldValue("file", f);
+    };
+
+    const handleIndexingClose = () => {
+        setMode("main");
+        setLastAddedBookId(null);
+        setIndexingStatus(null);
+        onClose?.();
     };
 
     return (
@@ -160,6 +191,44 @@ export default function WorkWIthBookModal({ isOpen, onClose }) {
                                 </button>
                             </div>
                         </form>
+                    </>
+                )}
+
+                {mode === "indexing" && (
+                    <>
+                        <div className="modal-header">
+                            <h2>Добавление книги</h2>
+                            <button className="close-btn" onClick={handleIndexingClose}> X </button>
+                        </div>
+                        <div className="modal-content">
+                            <div className="indexing-progress">
+                                <p>Книга загружена. Статус индексации:</p>
+                                <div className="indexing-status">
+                                    <strong>{indexingStatus || "—"}</strong>
+                                    {indexingStatus === "INDEXING" && <span className="spinner" />}
+                                    {indexingStatus === "INDEXED" && <span className="status-ok" />}
+                                    {indexingStatus === "FAILED" && <span className="status-fail" />}
+                                </div>
+                                {indexingStatus === "INDEXING" && (
+                                    <p style={{ color: "#888", fontSize: "13px" }}>
+                                        Индексация выполняется в фоне. Вы можете закрыть это окно и продолжить работу - книга будет проиндексирована автоматически.
+                                    </p>
+                                )}
+                                {indexingStatus === "INDEXED" && (
+                                    <p style={{ color: "green" }}>Книга успешно проиндексирована!</p>
+                                )}
+                                {indexingStatus === "FAILED" && (
+                                    <p style={{ color: "red" }}>Ошибка индексации. Попробуйте переиндексировать в карточке книги.</p>
+                                )}
+                                <div className="modal-buttons" style={{ marginTop: "20px" }}>
+                                    <button className="save-btn" onClick={handleIndexingClose}>
+                                        {indexingStatus === "INDEXING"
+                                            ? "можно закрывать, книжка загружается в библиотеку"
+                                            : "закрыть"}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </>
                 )}
             </div>
