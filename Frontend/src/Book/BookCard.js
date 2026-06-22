@@ -40,6 +40,8 @@ export default function BookCard({ id, book, onClick, isRatingViewed, showIndexi
                 reviews.reduce((s, r) => s + r.rating, 0) / reviews.length;
 
             setAvgRating(avg);
+        }).catch(err => {
+            console.error("Ошибка загрузки отзывов:", err);
         });
     }, [id]);
 
