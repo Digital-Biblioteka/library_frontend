@@ -4,8 +4,9 @@ import "./reader.css";
 import "./bookmark.css";
 import { getLastReadingPos, getToc, postReadingPos, getChapByToc, getChapByIdx } from "./api/readerApi";
 import { searchContent } from "./api/contentSearchApi";
+import { askBook } from "./api/askBookApi";
 import { useBookmarks, BookmarksPanel } from "./Bookmark";
-import { IconSearch } from "./Icons";
+import { IconSearch, IconQuestion } from "./Icons";
 
 const TocItem = ({ item, goToItem, level = 0 }) => (
     <div>
@@ -50,6 +51,11 @@ const Reader = () => {
     const [searchVis, setSearchVis] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState([]);
+
+    const [askVis, setAskVis] = useState(false);
+    const [askQuestion, setAskQuestion] = useState("");
+    const [askAnswer, setAskAnswer] = useState(null);
+    const [askLoading, setAskLoading] = useState(false);
 
     const { bookmarks, add: addBookmark, remove: deleteBookmark, update: editBookmark } = useBookmarks(id);
 
@@ -268,6 +274,21 @@ const Reader = () => {
         }
     };
 
+    const handleAskQuestion = async () => {
+        if (!askQuestion.trim() || !id) return;
+        setAskLoading(true);
+        setAskAnswer(null);
+        try {
+            const resp = await askBook(askQuestion, id, 10);
+            setAskAnswer(resp);
+        } catch (e) {
+            console.error("Ошибка Q&A запроса", e);
+            setAskAnswer({ answer: "Не удалось получить ответ.", sources: [] });
+        } finally {
+            setAskLoading(false);
+        }
+    };
+
     const goToSearchResult = async (result) => {
         setSearchVis(false);
         setSearchResults([]);
@@ -294,6 +315,32 @@ const Reader = () => {
         });
     };
 
+    const goToAskSource = async (source) => {
+        setAskVis(false);
+        setAskAnswer(null);
+        setAskQuestion("");
+
+        const targetIdx = source.chapter_index;
+        if (targetIdx != null && targetIdx !== spineIdx) {
+            await loadChapter(() => getChapByIdx(id, targetIdx));
+        }
+
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                const container = containerRef.current;
+                if (!container) return;
+                const block = container.querySelector(
+                    `[data-block-idx="${source.paragraph_index}"]`
+                );
+                if (block) {
+                    block.scrollIntoView({ behavior: "smooth", block: "center" });
+                    block.classList.add("bookmark-focus");
+                    setTimeout(() => block.classList.remove("bookmark-focus"), 1200);
+                }
+            });
+        });
+    };
+
     return (
         <div className="reader-wrapper ">
             <div className="reader-header">
@@ -306,6 +353,7 @@ const Reader = () => {
                     <button className="close-btn" onClick={() => setTocVis(v => !v)}>☰</button>
                     <button className="bookmark-btn" onClick={() => setBmVis(v => !v)}>⚐</button>
                     <button className="search-btn-reader" onClick={() => setSearchVis(v => !v)}><IconSearch size={18} /></button>
+                    <button className="ask-btn-reader" onClick={() => setAskVis(v => !v)}><IconQuestion size={18} /></button>
                 </div>
                 <div className="header-center">{title}</div>
             </div>
@@ -352,6 +400,40 @@ const Reader = () => {
                                     />
                                 </div>
                             ))}
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {askVis && (
+                <div className="reader-ask-panel">
+                    <div className="reader-ask-input-row">
+                        <input
+                            className="reader-ask-input"
+                            placeholder="Задайте вопрос по книге..."
+                            value={askQuestion}
+                            onChange={(e) => setAskQuestion(e.target.value)}
+                            onKeyDown={(e) => e.key === "Enter" && handleAskQuestion()}
+                        />
+                        <button className="reader-ask-go" onClick={handleAskQuestion} disabled={askLoading}>
+                            {askLoading ? "..." : "Спросить"}
+                        </button>
+                    </div>
+                    {askLoading && <div className="reader-ask-loading">Поиск ответа...</div>}
+                    {askAnswer && !askLoading && (
+                        <div className="reader-ask-answer">
+                            <div className="reader-ask-answer-text">{askAnswer.answer}</div>
+                            {askAnswer.sources && askAnswer.sources.length > 0 && (
+                                <div className="reader-ask-sources">
+                                    <div className="reader-ask-sources-title">Источники (нажмите на отрывок, чтобы перейти):</div>
+                                    {askAnswer.sources.map((s, idx) => (
+                                        <div key={idx} className="reader-ask-source-item" onClick={() => goToAskSource(s)}>
+                                            <span className="reader-ask-source-chapter">{s.chapter}</span>
+                                            <span className="reader-ask-source-snippet">{s.text_snippet}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>
