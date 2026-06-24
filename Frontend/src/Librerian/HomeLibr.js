@@ -43,10 +43,23 @@ export default function HomeLibr() {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
 
-    const notificationsCount = useMemo(
-        () => bookRequests.length + categoryRequests.length,
-        [bookRequests.length, categoryRequests.length]
-    );
+    const isActiveRequest = (request) => {
+        const status = String(request.status || "").toUpperCase();
+
+        return ![
+            "APPROVED",
+            "ACCEPTED",
+            "REJECTED",
+            "DECLINED"
+        ].includes(status);
+    };
+
+    const notificationsCount = useMemo(() => {
+        return (
+            bookRequests.filter(isActiveRequest).length +
+            categoryRequests.filter(isActiveRequest).length
+        );
+    }, [bookRequests, categoryRequests]);
 
     useEffect(() => {
         loadGroups();
@@ -162,14 +175,22 @@ export default function HomeLibr() {
 
     const handleCreateBookLimitRequest = async (payload) => {
         await run(async () => {
-            await createLimitRequest(payload);
+            await createLimitRequest(
+                payload.groupID || payload.groupId,
+                payload.bookID || payload.bookId,
+                payload.requestedLimit
+            );
             await refreshSelectedGroup();
         });
     };
 
     const handleCreateCategoryLimitRequest = async (payload) => {
         await run(async () => {
-            await createCategoryLimitRequest(payload);
+            await createCategoryLimitRequest(
+                payload.groupID || payload.groupId,
+                payload.categoryID || payload.categoryId,
+                payload.requestedLimit
+            );
             await refreshSelectedGroup();
         });
     };
@@ -283,10 +304,13 @@ export default function HomeLibr() {
                 title={requestsModal?.title}
                 type={requestsModal?.type}
                 requests={requestsModal?.type === "category" ? categoryRequests : bookRequests}
+                groupBooks={books}
+                selectedGroup={selectedGroup}
                 isLoading={isLoading}
                 onClose={() => setRequestsModal(null)}
-                onApprove={approveBookRequest}
-                onReject={rejectCategoryRequest}
+                onApprove={requestsModal?.type === "category" ? approveCategoryRequest : approveBookRequest}
+                onReject={requestsModal?.type === "category" ? rejectCategoryRequest : undefined}
+                onRequestBookFromAdmin={handleCreateBookLimitRequest}
             />
         </div>
     );

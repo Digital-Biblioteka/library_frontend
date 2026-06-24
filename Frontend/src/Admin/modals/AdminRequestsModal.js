@@ -72,7 +72,7 @@ export default function AdminRequestsModal({ isOpen, onClose }) {
                             className={mode === "category" ? "tab active" : "tab"}
                             onClick={() => setMode("category")}
                         >
-                            Запросы на категории
+                            Запросы на book-sets
                         </button>
                     </div>
                     <button className="close-btn" onClick={onClose}> X </button>
@@ -82,7 +82,7 @@ export default function AdminRequestsModal({ isOpen, onClose }) {
                     <thead>
                     <tr>
                         <th>Group</th>
-                        <th>{mode === "book" ? "Book" : "Category"}</th>
+                        <th>{mode === "book" ? "Book" : "Book Set"}</th>
                         <th>Requested limit</th>
                         <th>Status</th>
                         <th>Actions</th>

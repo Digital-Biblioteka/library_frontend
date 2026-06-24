@@ -6,11 +6,32 @@ import WorkWIthBookModal from "./modals/AdminAddBookModal";
 import {useState} from "react";
 import WorkWithUsersModal from "./modals/AdminUsersModal";
 import AdminRequestsModal from "./modals/AdminRequestsModal";
+import AdminBookSetsModal from "./modals/AdminBookSetModal";
+import { reindexAllBooks } from "./api/adminBookApi";
+
+
 export default function HomeAdmin() {
     const username = getUsername();
     const [isBookModalOpen, setIsBookModalOpen] = useState(false);
     const [isUserModalOpen, setIsUserModalOpen] = useState(false)
     const [isRequestsModalOpen, setIsRequestsModalOpen] = useState(false)
+    const [reindexingAll, setReindexingAll] = useState(false);
+    const [isBookSetsModalOpen, setIsBookSetsModalOpen] = useState(false);
+
+    const handleReindexAll = async () => {
+        if (!window.confirm("Переиндексировать все книги? Это может занять некоторое время.")) return;
+        setReindexingAll(true);
+        try {
+            const msg = await reindexAllBooks();
+            alert(msg);
+        } catch (err) {
+            alert(err.message);
+        } finally {
+            setReindexingAll(false);
+        }
+    };
+
+
     return (
         <div className="Home">
             <div className="home-admin">
@@ -39,6 +60,18 @@ export default function HomeAdmin() {
                             onClick={() => setIsRequestsModalOpen(true)}>
                         Запросы на лимиты
                     </button>
+                    <button
+                        className="admin-button"
+                        onClick={() => setIsBookSetsModalOpen(true)}
+                    >
+                        Управление book-sets
+                    </button>
+
+                    <button className="admin-button"
+                            onClick={handleReindexAll}
+                            disabled={reindexingAll}>
+                        {reindexingAll ? "Переиндексация..." : "Переиндексировать все книги"}
+                    </button>
                 </div>
 
                 <WorkWIthBookModal
@@ -54,6 +87,11 @@ export default function HomeAdmin() {
                 <AdminRequestsModal
                     isOpen={isRequestsModalOpen}
                     onClose={() => setIsRequestsModalOpen(false)}
+                />
+
+                <AdminBookSetsModal
+                    isOpen={isBookSetsModalOpen}
+                    onClose={() => setIsBookSetsModalOpen(false)}
                 />
             </div>
         </div>

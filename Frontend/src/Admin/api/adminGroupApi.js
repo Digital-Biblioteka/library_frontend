@@ -244,3 +244,119 @@ export async function rejectCategoryLimitRequest(requestId) {
 
     return res.json();
 }
+
+const CATEGORY_API = "http://localhost:8080/api/categories";
+
+// ------------------------ BOOK SETS ------------------------
+
+export async function getAllBookSets() {
+    const res = await fetch(`${CATEGORY_API}`, {
+        method: "GET",
+        headers: {
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        }
+    });
+
+    if (!res.ok) {
+        const msg = await res.text();
+        throw new Error(`Ошибка получения book-sets: ${msg}`);
+    }
+
+    return res.json();
+}
+
+export async function createBookSet(bookSet) {
+    const res = await fetch(`${CATEGORY_API}`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        },
+        body: JSON.stringify(bookSet)
+    });
+
+    if (!res.ok) {
+        const msg = await res.text();
+        throw new Error(`Ошибка создания book-set: ${msg}`);
+    }
+
+    return res.json();
+}
+
+export async function updateBookSet(id, bookSet) {
+    const res = await fetch(`${CATEGORY_API}/${id}`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        },
+        body: JSON.stringify(bookSet)
+    });
+
+    if (!res.ok) {
+        const msg = await res.text();
+        throw new Error(`Ошибка обновления book-set: ${msg}`);
+    }
+
+    return res.json();
+}
+
+export async function deleteBookSet(id) {
+    const res = await fetch(`${CATEGORY_API}/${id}`, {
+        method: "DELETE",
+        headers: {
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        }
+    });
+
+    if (!res.ok) {
+        const msg = await res.text();
+        throw new Error(`Ошибка удаления book-set: ${msg}`);
+    }
+}
+
+export async function getBooksInBookSet(id) {
+    const res = await fetch(`${CATEGORY_API}/${id}/books`, {
+        method: "GET",
+        headers: {
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        }
+    });
+
+    if (!res.ok) {
+        const msg = await res.text();
+        throw new Error(`Ошибка получения книг book-set: ${msg}`);
+    }
+
+    return res.json();
+}
+
+export async function addBookToBookSet(bookSetId, bookId) {
+    const res = await fetch(`${CATEGORY_API}/${bookSetId}/books/${bookId}`, {
+        method: "POST",
+        headers: {
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        }
+    });
+
+    if (!res.ok) {
+        const msg = await res.text();
+        throw new Error(`Ошибка добавления книги в book-set: ${msg}`);
+    }
+
+    return res.json();
+}
+
+export async function removeBookFromBookSet(bookSetId, bookId) {
+    const res = await fetch(`${CATEGORY_API}/${bookSetId}/books/${bookId}`, {
+        method: "DELETE",
+        headers: {
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        }
+    });
+
+    if (!res.ok) {
+        const msg = await res.text();
+        throw new Error(`Ошибка удаления книги из book-set: ${msg}`);
+    }
+}
