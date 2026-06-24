@@ -9,13 +9,19 @@ import BookForm from "../form/BookForm";
 export default function AdminEditorModal({ isOpen, onClose, book, onBookUpdated, onBookDeleted }) {
     const navigate = useNavigate();
     const [mode, setMode] = useState("main");
+    const [reindexing, setReindexing] = useState(false);
 
     const handleReindex = async () => {
         if (!book?.id) return;
+        setReindexing(true);
         try {
             await reindexBook(book.id);
+            alert("Переиндексация успешно завершена");
         } catch (err) {
             console.error("Reindex failed:", err);
+            alert("Ошибка переиндексации: " + err.message);
+        } finally {
+            setReindexing(false);
         }
     };
 
@@ -96,6 +102,10 @@ export default function AdminEditorModal({ isOpen, onClose, book, onBookUpdated,
 
                             <button className="delete-btn" onClick={handleDeleteBook}>
                                 Delete
+                            </button>
+
+                            <button className="add-btn" onClick={handleReindex} disabled={reindexing}>
+                                {reindexing ? "Переиндексация..." : "Переиндексировать"}
                             </button>
                         </div>
                     </>

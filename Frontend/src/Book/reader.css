@@ -344,3 +344,128 @@
     background-color: rgba(255, 177, 208, 0.25);
     transition: background-color 0.3s ease;
 }
+
+.ask-btn-reader {
+    background: none;
+    cursor: pointer;
+    font-size: 18px;
+    border: none;
+    padding: 4px 8px;
+}
+
+.ask-btn-reader:hover {
+    opacity: 0.7;
+}
+
+.reader-ask-panel {
+    position: absolute;
+    top: 55px;
+    right: 10px;
+    width: 360px;
+    max-height: 75vh;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    z-index: 200;
+    padding: 12px;
+    overflow-y: auto;
+}
+
+.reader-ask-input-row {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 8px;
+}
+
+.reader-ask-input {
+    flex: 1;
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+}
+
+.reader-ask-input:focus {
+    border-color: #E35B91;
+}
+
+.reader-ask-go {
+    padding: 8px 14px;
+    background: #E35B91;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.reader-ask-go:hover {
+    background: #FFB1D0;
+    color: black;
+}
+
+.reader-ask-go:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.reader-ask-loading {
+    font-size: 13px;
+    color: #999;
+    text-align: center;
+    padding: 10px 0;
+}
+
+.reader-ask-answer {
+    margin-top: 4px;
+}
+
+.reader-ask-answer-text {
+    font-size: 14px;
+    line-height: 1.5;
+    color: #222;
+    padding: 10px;
+    background: #f9f0f5;
+    border-radius: 8px;
+    white-space: pre-wrap;
+}
+
+.reader-ask-sources {
+    margin-top: 10px;
+}
+
+.reader-ask-sources-title {
+    font-size: 11px;
+    color: #999;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.reader-ask-source-item {
+    padding: 6px 8px;
+    border-radius: 6px;
+    margin-bottom: 4px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.reader-ask-source-item:hover {
+    background: #f5f0f2;
+}
+
+.reader-ask-source-chapter {
+    display: block;
+    font-size: 11px;
+    color: #999;
+    margin-bottom: 2px;
+}
+
+.reader-ask-source-snippet {
+    display: block;
+    font-size: 12px;
+    color: #444;
+    line-height: 1.4;
+}

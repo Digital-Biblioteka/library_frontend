@@ -9,6 +9,7 @@ import AdminRequestsModal from "./modals/AdminRequestsModal";
 import AdminBookSetsModal from "./modals/AdminBookSetModal";
 import { reindexAllBooks } from "./api/adminBookApi";
 
+
 export default function HomeAdmin() {
     const username = getUsername();
     const [isBookModalOpen, setIsBookModalOpen] = useState(false);
@@ -29,6 +30,7 @@ export default function HomeAdmin() {
             setReindexingAll(false);
         }
     };
+
 
     return (
         <div className="Home">
