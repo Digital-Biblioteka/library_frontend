@@ -119,6 +119,13 @@ export default function WorkWIthBookModal({ isOpen, onClose }) {
         if (f) formik.setFieldValue("file", f);
     };
 
+    const handleIndexingClose = () => {
+        setMode("main");
+        setLastAddedBookId(null);
+        setIndexingStatus(null);
+        onClose?.();
+    };
+
     return (
         <div className="modal-overlay">
             <div className="modal-window"

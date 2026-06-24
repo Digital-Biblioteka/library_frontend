@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./modal-window.css";
 import { useNavigate } from "react-router-dom";
-import { openBook } from "../Book/api/readerApi";
 import { addBookToList, deleteReadLaterBook, getReadLaterList } from "../Book/api/readlaterApi";
 import ReviewsModal from "../Book/ReviewModal";
 import BookAccessRequestModal from "./BookAccessRequestModal";

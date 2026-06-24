@@ -56,3 +56,232 @@
 .bookmark-btn:hover{
     background: #E35B91;
 }
+
+.bookmark-actions {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.bookmark-group-form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.bookmark-group-form input,
+.bookmark-group-form select,
+.bookmark-group-filter select {
+    width: 100%;
+    padding: 6px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+}
+
+.bookmark-group-filter {
+    margin: 12px 0;
+}
+
+.bookmark-group-filter label {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 12px;
+    color: #666;
+}
+
+.bookmark-hint {
+    font-size: 11px;
+    color: #777;
+}
+
+.bookmark-error {
+    color: #b00020;
+    font-size: 12px;
+    margin-bottom: 8px;
+}
+
+.bookmark-group-token {
+    font-size: 12px;
+    margin-bottom: 8px;
+    word-break: break-all;
+}
+
+.bookmark-add-to-group-list {
+    margin-top: 16px;
+    border-top: 1px solid #eee;
+    padding-top: 10px;
+}
+
+.bookmark-add-to-group {
+    display: block;
+    width: 100%;
+    margin-bottom: 6px;
+    padding: 6px;
+    cursor: pointer;
+}
+
+.bookmark-text-highlight {
+    background-color: #fff176;
+    border-radius: 3px;
+    padding: 0 1px;
+}
+
+.bookmark-context-menu {
+    position: fixed;
+    z-index: 1000;
+    background: #ffffff;
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
+    padding: 6px;
+}
+
+.bookmark-context-menu button {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 8px 12px;
+    font-size: 14px;
+}
+
+.bookmark-context-menu button:hover {
+    background: #f5f5f5;
+}
+
+.bookmark-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1001;
+    background: rgba(0, 0, 0, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bookmark-create-modal {
+    width: 360px;
+    max-width: calc(100vw - 30px);
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.25);
+}
+
+.bookmark-create-modal h3 {
+    margin: 0 0 12px;
+}
+
+.bookmark-create-modal label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 12px;
+    font-size: 13px;
+}
+
+.bookmark-create-modal textarea,
+.bookmark-create-modal select {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.bookmark-create-modal textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+.bookmark-selected-preview {
+    max-height: 120px;
+    overflow-y: auto;
+    background: #f7f7f7;
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 14px;
+    line-height: 1.45;
+}
+
+.bookmark-color-list {
+    display: flex;
+    gap: 8px;
+}
+
+.bookmark-color {
+    width: 28px;
+    height: 28px;
+    border: 2px solid transparent;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.bookmark-color.active {
+    border-color: #222;
+}
+
+.bookmark-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+.bookmark-card {
+    padding: 10px;
+    border-bottom: 1px solid #e6e6e6;
+}
+
+.bookmark-card-text {
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1.4;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.bookmark-card-text:hover {
+    text-decoration: underline;
+}
+
+.bookmark-card-note {
+    font-size: 13px;
+    line-height: 1.4;
+    color: #444;
+    margin-bottom: 8px;
+    white-space: pre-wrap;
+}
+
+.bookmark-empty-note {
+    color: #999;
+    font-style: italic;
+}
+
+.bookmark-card-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.bookmark-card-actions button {
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.bookmark-edit-note {
+    width: 100%;
+    min-height: 70px;
+    box-sizing: border-box;
+    resize: vertical;
+    margin-bottom: 8px;
+}
+
+.bookmark-group-check.nested {
+    padding-left: 20px;
+}
+
+.bookmark-groups-visibility {
+    margin-left: auto;
+    display: flex;
+    flex-direction: column;
+}

@@ -10,7 +10,8 @@ export function TokenParser() {
         return {
             username: parsed.username || "NO NAME!!!!",
             role: parsed.role,
-            email: parsed.email
+            email: parsed.email,
+            id: parsed.id
         }
     } catch (e) {
         console.log(e.message)
@@ -31,6 +32,11 @@ export function getRole() {
 export function getEmail() {
     const parser = TokenParser();
     return parser?.email || "";
+}
+
+export function getId() {
+    const p = TokenParser();
+    return p?.id;
 }
 
 export function logout() {
