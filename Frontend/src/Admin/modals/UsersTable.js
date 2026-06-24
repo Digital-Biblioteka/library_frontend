@@ -30,7 +30,7 @@ export default function UsersTable({
                             className="add-btn"
                             onClick={onCreate}
                         >
-                            Создать пользователя
+                            Create User
                         </button>
                     </th>
                 </tr>
@@ -58,21 +58,21 @@ export default function UsersTable({
 
                             <td>
                                 {isCurrentUser ? (
-                                    "это вы"
+                                    "this is you"
                                 ) : (
                                     <>
                                         <button
                                             className="action-btn"
                                             onClick={() => onEdit(user)}
                                         >
-                                            ✎
+                                            Edit
                                         </button>
 
                                         <button
-                                            className="action-btn"
+                                            className="delete-btn"
                                             onClick={() => onDelete(user.id)}
                                         >
-                                            🗑
+                                            Delete
                                         </button>
                                     </>
                                 )}

@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { openBook } from "../Book/api/readerApi";
 import { addBookToList, deleteReadLaterBook, getReadLaterList } from "../Book/api/readlaterApi";
 import ReviewsModal from "../Book/ReviewModal";
+import BookAccessRequestModal from "./BookAccessRequestModal";
+import {tryOpenBook} from "../Book/api/accessRequestApi";
 
 export default function UserBookModal({ isOpen, onClose, book, id }) {
     const navigate = useNavigate();
@@ -12,6 +14,7 @@ export default function UserBookModal({ isOpen, onClose, book, id }) {
     const [liked, setLiked] = useState(false);
     const [loading, setLoading] = useState(false);
     const [reviewsOpen, setReviewsOpen] = useState(false);
+    const [accessRequestOpen, setAccessRequestOpen] = useState(false);
 
     useEffect(() => {
         if (!isOpen || !token || !id) return;
@@ -26,11 +29,18 @@ export default function UserBookModal({ isOpen, onClose, book, id }) {
     const handleOpenBook = async () => {
         try {
             if (token) {
-                await openBook(id);
+                await tryOpenBook(id);
+                navigate("/reader", { state: { title: book.title, id } });
+                return;
             }
+
             navigate("/reader", { state: { title: book.title, id } });
         } catch (e) {
             console.error("Ошибка открытия книги:", e);
+
+            if (token && (e.status === 403 || e.status === 401)) {
+                setAccessRequestOpen(true);
+            }
         }
     };
 
@@ -89,6 +99,12 @@ export default function UserBookModal({ isOpen, onClose, book, id }) {
                     bookId={id}
                     isOpen={reviewsOpen}
                     onClose={() => setReviewsOpen(false)}
+                />
+                <BookAccessRequestModal
+                    bookId={id}
+                    book={book}
+                    isOpen={accessRequestOpen}
+                    onClose={() => setAccessRequestOpen(false)}
                 />
             </div>
         </div>

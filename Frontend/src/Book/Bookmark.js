@@ -75,7 +75,7 @@ export const Bookmark = ({ bm, onSelect, onDelete, onUpdate }) => {
     const [note, setNote] = useState("");
     return (
         <div className="bookmark-meta">
-            <h4 style={{cursor:"pointer"}} onClick={() => onSelect(bm)}>Заметка {bm.spine_reference}</h4>
+            <h4 style={{cursor:"pointer"}} onClick={() => onSelect(bm)}>{bm.selectedText}</h4>
             <input
                 type="text"
                 placeholder="Добавьте заметку"

@@ -5,7 +5,9 @@
 .admin-button,
 .search-btn,
 .sign-up-btn,
-.sign-in-btn {
+.sign-in-btn,
+.delete-btn,
+.approve-btn {
     padding: 10px 14px;
     border-radius: 8px;
     border: 1px solid #000000;
@@ -71,4 +73,22 @@
 .action-btn:hover {
     background-color: gainsboro;
     color: black;
+}
+
+.delete-btn {
+    background: #ea2643;
+    color: white;
+}
+
+.delete-btn:hover {
+    background: #ed6f82;
+}
+
+.approve-btn {
+    background: #15803d;
+    color: white;
+}
+
+.approve-btn:hover {
+    background: #98ddaa;
 }

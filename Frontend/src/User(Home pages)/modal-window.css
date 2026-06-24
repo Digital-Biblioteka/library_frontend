@@ -63,6 +63,7 @@
 .modal-form input[type="text"],
 .modal-form input[type="file"],
 .modal-form input[type="password"],
+.modal-form input[type="number"],
 .rs__control {
     width: 100%;
     padding: 10px 12px;

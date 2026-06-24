@@ -111,7 +111,7 @@ export default function UserFormModal({
 
             <Select
                 options={roles}
-                placeholder="Выберите роль"
+                placeholder="Choose role"
                 defaultValue={formik.values.role}
                 onChange={(option) =>
                     formik.setFieldValue("role", option?.value || "" )
@@ -125,8 +125,8 @@ export default function UserFormModal({
                 <button type="submit" className="save-btn">
                     {
                         mode === "create"
-                            ? "Создать"
-                            : "Сохранить"
+                            ? "Create"
+                            : "Save"
                     }
                 </button>
 
@@ -135,7 +135,7 @@ export default function UserFormModal({
                     className="action-btn"
                     onClick={onBack}
                 >
-                    Назад
+                    Back
                 </button>
 
             </div>

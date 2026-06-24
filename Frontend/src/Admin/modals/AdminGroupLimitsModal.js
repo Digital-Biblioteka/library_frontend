@@ -61,7 +61,7 @@ export default function AdminGroupLimitsModal({ isOpen, group, onClose, books })
         <div className="admin-modal-overlay">
             <div className="admin-modal-window" onClick={e => e.stopPropagation()}>
                 <div className="modal-header">
-                    <h2>Лимиты группы {group.name}</h2>
+                    <h2>Limits of {group.name}</h2>
                     <button className="close-btn" onClick={onClose}> X </button>
                 </div>
 
@@ -77,7 +77,7 @@ export default function AdminGroupLimitsModal({ isOpen, group, onClose, books })
                         <tbody>
                         {limits.length === 0 ? (
                             <tr>
-                                <td colSpan="3">Лимитов пока нет</td>
+                                <td colSpan="3">No limits</td>
                             </tr>
                         ) : (
                             limits.map(limit => (
@@ -89,7 +89,7 @@ export default function AdminGroupLimitsModal({ isOpen, group, onClose, books })
                                             className="action-btn"
                                             onClick={() => setSelectedLimit(limit)}
                                         >
-                                            ✎
+                                            Change
                                         </button>
                                     </td>
                                 </tr>
@@ -103,7 +103,7 @@ export default function AdminGroupLimitsModal({ isOpen, group, onClose, books })
                     {!selectedLimit && (
                         <Select
                             options={bookOptions}
-                            placeholder="Выберите книгу"
+                            placeholder="Choose book"
                             onChange={(option) =>
                                 formik.setFieldValue("bookID", option?.value || "")
                             }
@@ -115,14 +115,14 @@ export default function AdminGroupLimitsModal({ isOpen, group, onClose, books })
                     <input
                         type="number"
                         name="limit"
-                        placeholder="Лимит"
+                        placeholder="Limit"
                         value={formik.values.limit}
                         onChange={formik.handleChange}
                     />
 
                     <div className="modal-buttons">
                         <button type="submit" className="save-btn">
-                            {selectedLimit ? "Сохранить" : "Добавить лимит"}
+                            Save
                         </button>
 
                         {selectedLimit && (
@@ -131,7 +131,7 @@ export default function AdminGroupLimitsModal({ isOpen, group, onClose, books })
                                 className="action-btn"
                                 onClick={() => setSelectedLimit(null)}
                             >
-                                Отмена
+                                Cancel
                             </button>
                         )}
                     </div>

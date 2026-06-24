@@ -27,10 +27,11 @@ export default function WorkWIthBookModal({ isOpen, onClose }) {
     const fileInputRef = useRef(null);
     const [mode, setMode] = useState("main");
     const [manualMode, setManualMode] = useState(false);
-    const [isPrivate, setIsPrivate] = useState(false);
+    const [isPrivate, setIsPrivate] = useState("PUBLIC");
+    const [isLoading, setIsLoading] = useState(false);
 
     const handlePrivateCheckbox = (e) => {
-        setIsPrivate(e.target.checked);
+        setIsPrivate(e.target.checked? "PRIVATE": "PUBLIC");
     };
 
     const formik = useFormik({
@@ -45,12 +46,12 @@ export default function WorkWIthBookModal({ isOpen, onClose }) {
 
         validate: (values) => validate(values, manualMode),
         onSubmit: async (values, { resetForm }) => {
+            setIsLoading(true);
             try {
                 console.log("[addBook] onSubmit fired, values:", values);
                 const dto = {
                     mode: manualMode ? "manual" : "auto",
-                    bookDTO: manualMode
-                        ? {
+                    bookDTO: manualMode? {
                             title: values.title,
                             author: values.author,
                             description: values.description,
@@ -58,6 +59,7 @@ export default function WorkWIthBookModal({ isOpen, onClose }) {
                             publisher: values.publisher,
                         }
                         : null,
+                    publicityType: isPrivate,
                 };
 
                 const formData = new FormData();
@@ -79,6 +81,8 @@ export default function WorkWIthBookModal({ isOpen, onClose }) {
             } catch (err) {
                 console.error("[addBook] upload FAILED:", err);
                 alert(err.message);
+            } finally {
+                setIsLoading(false);
             }
         },
     });
@@ -148,8 +152,12 @@ export default function WorkWIthBookModal({ isOpen, onClose }) {
                             </div>
 
                             <div className="modal-buttons">
-                                <button type="submit" className="save-btn">
-                                    Сохранить
+                                <button
+                                    type="submit"
+                                    className="save-btn"
+                                    disabled={isLoading}
+                                >
+                                    {isLoading ? "Загрузка..." : "Сохранить"}
                                 </button>
                                 <button type="button" className="action-btn"
                                         onClick={() => {

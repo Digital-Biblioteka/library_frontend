@@ -34,7 +34,7 @@ export default function LimitRequestsPanel({
     return (
         <section className="limits-layout">
             <form className="limit-form" onSubmit={submitBook}>
-                <h3>Запрос лимита на книгу</h3>
+                <h3>Limit request for a book</h3>
                 <input
                     value={bookForm.bookID}
                     onChange={(e) => setBookForm({ ...bookForm, bookID: e.target.value })}
@@ -46,18 +46,18 @@ export default function LimitRequestsPanel({
                     min="1"
                     value={bookForm.requestedLimit}
                     onChange={(e) => setBookForm({ ...bookForm, requestedLimit: e.target.value })}
-                    placeholder="Новый лимит"
+                    placeholder="New Limit"
                     required
                 />
                 <button className="add-btn" disabled={isLoading}>Отправить</button>
             </form>
 
             <form className="limit-form" onSubmit={submitCategory}>
-                <h3>Запрос лимита на категорию</h3>
+                <h3>Limit request for a books-set</h3>
                 <input
                     value={categoryForm.categoryID}
                     onChange={(e) => setCategoryForm({ ...categoryForm, categoryID: e.target.value })}
-                    placeholder="Category"
+                    placeholder="Book-Set"
                     required
                 />
                 <input
@@ -65,19 +65,19 @@ export default function LimitRequestsPanel({
                     min="1"
                     value={categoryForm.requestedLimit}
                     onChange={(e) => setCategoryForm({ ...categoryForm, requestedLimit: e.target.value })}
-                    placeholder="Новый лимит"
+                    placeholder="New Limit"
                     required
                 />
-                <button className="add-btn" disabled={isLoading}>Отправить</button>
+                <button className="add-btn" disabled={isLoading}>Send</button>
             </form>
 
             <div className="requests-table-card">
-                <h3>Мои запросы лимитов на книги</h3>
+                <h3>My requests for books</h3>
                 <RequestsTable items={bookLimitRequests} entityKey="book" />
             </div>
 
             <div className="requests-table-card">
-                <h3>Мои запросы лимитов на категории</h3>
+                <h3>My requests for book-sets</h3>
                 <RequestsTable items={categoryLimitRequests} entityKey="category" />
             </div>
         </section>
