@@ -12,6 +12,8 @@ export async function openBook(id) {
         console.error(`Ошибка открывания книги: ${text}`);
     }
 
+    console.log(res)
+
     return text
 }
 

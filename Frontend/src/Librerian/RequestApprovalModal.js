@@ -30,15 +30,15 @@ export default function RequestsApprovalModal({
                 <div className="lib-modal-header">
                     <div>
                         <h3>{title}</h3>
-                        <p>Проверьте запрос перед апрувом</p>
+                        <p>Check request before approve</p>
                     </div>
                     <button type="button" className="icon-btn" onClick={onClose}>×</button>
                 </div>
 
                 {isLoading ? (
-                    <div className="state-message">Загружаем запросы...</div>
+                    <div className="state-message">Loading requests...</div>
                 ) : requests.length === 0 ? (
-                    <div className="state-message">Нет активных запросов</div>
+                    <div className="state-message">No active requests</div>
                 ) : (
                     <div className="requests-list">
                         {requests.map((request) => (
@@ -52,13 +52,12 @@ export default function RequestsApprovalModal({
                                     </div>
                                 </div>
                                 <div className="request-actions">
-                                    {type === "category" && (
-                                        <button className="danger-btn" onClick={() => onReject(request.id)}>
-                                            Отклонить
-                                        </button>
-                                    )}
-                                    <button className="primary-btn" onClick={() => onApprove(request.id)}>
-                                        approve
+                                    <button className="delete-btn" onClick={() => onReject(request.id)}>
+                                        Reject
+                                    </button>
+
+                                    <button className="approve-btn" onClick={() => onApprove(request.id)}>
+                                        Approve
                                     </button>
                                 </div>
                             </div>

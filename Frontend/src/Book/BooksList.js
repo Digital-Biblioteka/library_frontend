@@ -98,7 +98,7 @@ export default function BooksList() {
 
             {books.length > 0 && !isContentSearch && (
                 <div className="sort-controls">
-                    <button className="rating-sort-btn" onClick={toggleSort}>
+                    <button className="add-btn" onClick={toggleSort}>
                         {sortLabel}
                     </button>
                 </div>

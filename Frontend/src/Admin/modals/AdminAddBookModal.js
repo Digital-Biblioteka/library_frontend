@@ -28,11 +28,13 @@ export default function WorkWIthBookModal({ isOpen, onClose }) {
     const [mode, setMode] = useState("main");
     const [manualMode, setManualMode] = useState(false);
     const [isPrivate, setIsPrivate] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const [indexingStatus, setIndexingStatus] = useState(null);
     const [lastAddedBookId, setLastAddedBookId] = useState(null);
 
+
     const handlePrivateCheckbox = (e) => {
-        setIsPrivate(e.target.checked);
+        setIsPrivate(e.target.checked? "PRIVATE": "PUBLIC");
     };
 
     const formik = useFormik({
@@ -47,12 +49,12 @@ export default function WorkWIthBookModal({ isOpen, onClose }) {
 
         validate: (values) => validate(values, manualMode),
         onSubmit: async (values, { resetForm }) => {
+            setIsLoading(true);
             try {
                 console.log("[addBook] onSubmit fired, values:", values);
                 const dto = {
                     mode: manualMode ? "manual" : "auto",
-                    bookDTO: manualMode
-                        ? {
+                    bookDTO: manualMode ? {
                             title: values.title,
                             author: values.author,
                             description: values.description,
@@ -60,6 +62,7 @@ export default function WorkWIthBookModal({ isOpen, onClose }) {
                             publisher: values.publisher,
                         }
                         : null,
+                    publicityType: isPrivate,
                 };
 
                 const formData = new FormData();
@@ -68,21 +71,23 @@ export default function WorkWIthBookModal({ isOpen, onClose }) {
                 console.log("[addBook] FormData ready, dto:", dto, "file:", values.file?.name);
 
                 const createdBook = await addBook(formData);
-                console.log("[addBook] upload success, createdBook:", createdBook);
+                console.log("[addBook] upload success");
 
                 resetForm();
+                setMode("main");
                 setManualMode(false);
 
                 if (fileInputRef.current) {
                     fileInputRef.current.value = "";
                 }
-
                 setLastAddedBookId(createdBook.id);
                 setIndexingStatus(createdBook.indexingStatus || "NOT_INDEXED");
                 setMode("indexing");
             } catch (err) {
                 console.error("[addBook] upload FAILED:", err);
                 alert(err.message);
+            }  finally {
+                setIsLoading(false);
             }
         },
     });
@@ -179,8 +184,12 @@ export default function WorkWIthBookModal({ isOpen, onClose }) {
                             </div>
 
                             <div className="modal-buttons">
-                                <button type="submit" className="save-btn">
-                                    Сохранить
+                                <button
+                                    type="submit"
+                                    className="save-btn"
+                                    disabled={isLoading}
+                                >
+                                    {isLoading ? "Загрузка..." : "Сохранить"}
                                 </button>
                                 <button type="button" className="action-btn"
                                         onClick={() => {

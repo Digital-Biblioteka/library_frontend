@@ -6,7 +6,7 @@ import {
     deleteUser
 } from "../api/adminUsersApi";
 
-import { getAllBooks } from "../api/adminBookApi";
+import {getAllPrivateBooks} from "../api/adminBookApi";
 
 import UsersTable from "./UsersTable";
 import GroupsTable from "./GroupsTable";
@@ -46,7 +46,7 @@ export default function WorkWithUsersModal({ isOpen, onClose }) {
     };
 
     const loadBooks = async () => {
-        const data = await getAllBooks();
+        const data = await getAllPrivateBooks();
         setBooks(data);
     };
 
@@ -74,14 +74,14 @@ export default function WorkWithUsersModal({ isOpen, onClose }) {
                                 className={activeTab === "users" ? "tab active" : "tab"}
                                 onClick={() => setActiveTab("users")}
                             >
-                                Пользователи
+                                Users
                             </button>
 
                             <button
                                 className={activeTab === "groups" ? "tab active" : "tab"}
                                 onClick={() => setActiveTab("groups")}
                             >
-                                Группы
+                                Groups
                             </button>
                         </div>
                     )}

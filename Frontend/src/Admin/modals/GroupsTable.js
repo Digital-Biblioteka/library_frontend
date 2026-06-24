@@ -54,7 +54,7 @@ export default function GroupsTable({
                             className="add-btn"
                             onClick={onCreate}
                         >
-                            Создать группу
+                            Create Group
                         </button>
                     </th>
                 </tr>
@@ -84,21 +84,21 @@ export default function GroupsTable({
                                     className="action-btn"
                                     onClick={() => onEdit(group)}
                                 >
-                                    ✎
+                                    Edit
                                 </button>
 
                                 <button
-                                    className="action-btn"
+                                    className="delete-btn"
                                     onClick={() => onDelete(group.id)}
                                 >
-                                    🗑
+                                   Delete
                                 </button>
 
                                 <button
                                     className="add-btn"
                                     onClick={() => onAddUser(group)}
                                 >
-                                    +
+                                    Add user
                                 </button>
                             </td>
                         </tr>

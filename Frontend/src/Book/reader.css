@@ -19,6 +19,12 @@
 .header-right {
     display: flex;
     align-items: center;
+    flex-direction: row;
+    gap: 8px;
+}
+
+.header-right {
+    justify-content: right;
 }
 
 .header-center {

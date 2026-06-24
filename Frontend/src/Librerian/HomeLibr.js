@@ -32,6 +32,7 @@ export default function HomeLibr() {
     const [mode, setMode] = useState("groups");
     const [books, setBooks] = useState([]);
     const [allUsers, setAllUsers] = useState([]);
+    const [selectedLimitRequest, setSelectedLimitRequest] = useState(null);
 
     const [bookRequests, setBookRequests] = useState([]);
     const [categoryRequests, setCategoryRequests] = useState([]);
@@ -103,6 +104,8 @@ export default function HomeLibr() {
         setBookLimitRequests(bookLimits || []);
         setCategoryLimitRequests(categoryLimits || []);
         setBooks(allBooks || []);
+
+        console.log(allBooks)
     }
 
     const handleGroupSelect = async (group) => {
@@ -246,8 +249,10 @@ export default function HomeLibr() {
 
                     {mode === "books" && (
                         <BooksGroupList
+                            selectedGroup={selectedGroup}
                             books={books}
                             onClose={() => setMode("users")}
+                            onRequestLimit={handleCreateBookLimitRequest}
                         />
                     )}
 
@@ -280,7 +285,7 @@ export default function HomeLibr() {
                 requests={requestsModal?.type === "category" ? categoryRequests : bookRequests}
                 isLoading={isLoading}
                 onClose={() => setRequestsModal(null)}
-                onApprove={requestsModal?.type === "category" ? approveCategoryRequest : approveBookRequest}
+                onApprove={approveBookRequest}
                 onReject={rejectCategoryRequest}
             />
         </div>

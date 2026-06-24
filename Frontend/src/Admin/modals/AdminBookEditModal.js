@@ -87,21 +87,21 @@ export default function AdminEditorModal({ isOpen, onClose, book, onBookUpdated,
             >
                 {mode === "main" && (
                     <>
-                        <h2>Редактировать книгу</h2>
+                        <h2>Edit Book</h2>
                         <button className="close-btn" onClick={onClose}> X </button>
 
                         <div className="modal-buttons">
                             <button className="add-btn" onClick={() => setMode("edit")}>
-                                Редактировать
+                                Edit
                             </button>
 
                             <button className="add-btn"
                                     onClick={handleOpenBook}>
-                                Открыть
+                                Open
                             </button>
 
-                            <button className="action-btn" onClick={handleDeleteBook}>
-                                Удалить
+                            <button className="delete-btn" onClick={handleDeleteBook}>
+                                Delete
                             </button>
 
                             <button className="add-btn" onClick={handleReindex} disabled={reindexing}>
@@ -117,11 +117,11 @@ export default function AdminEditorModal({ isOpen, onClose, book, onBookUpdated,
                             <BookForm formik={formik}/>
                             <div className="modal-buttons">
                                 <button type="submit" className="save-btn">
-                                    Сохранить
+                                    Save
                                 </button>
                                 <button type="button" className="action-btn"
                                     onClick={() => setMode("main")}>
-                                    Назад
+                                    Back
                                 </button>
                             </div>
                        </form>
