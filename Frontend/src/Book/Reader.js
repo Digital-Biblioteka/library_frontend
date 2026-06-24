@@ -317,8 +317,6 @@ const Reader = () => {
 
     const goToAskSource = async (source) => {
         setAskVis(false);
-        setAskAnswer(null);
-        setAskQuestion("");
 
         const targetIdx = source.chapter_index;
         if (targetIdx != null && targetIdx !== spineIdx) {
@@ -429,7 +427,7 @@ const Reader = () => {
                                     {askAnswer.sources.map((s, idx) => (
                                         <div key={idx} className="reader-ask-source-item" onClick={() => goToAskSource(s)}>
                                             <span className="reader-ask-source-chapter">{s.chapter}</span>
-                                            <span className="reader-ask-source-snippet">{s.text_snippet}</span>
+                                            <span className="reader-ask-source-snippet">{(s.text_snippet || '').replace(/<\/?em>/g, '')}</span>
                                         </div>
                                     ))}
                                 </div>
