@@ -2,7 +2,7 @@ const API_BASE = "http://localhost:8080/api/search/content";
 
 export async function searchContent(query, bookId = null, size = 10) {
     const body = { query, size };
-    if (bookId) body.bookId = String(bookId);
+    if (bookId) body.book_id = String(bookId);
 
     const res = await fetch(API_BASE, {
         method: "POST",

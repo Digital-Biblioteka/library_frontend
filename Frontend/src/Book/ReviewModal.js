@@ -27,36 +27,43 @@ export default function ReviewsModal({ bookId, isOpen, onClose }) {
     };
 
     const submitEdit = async () => {
-        await editReview(
-            {
-                rating: editRating,
-                comment: editComment
-            },
-            userReview.id
-        );
+        try {
+            await editReview(
+                {
+                    rating: editRating,
+                    comment: editComment
+                },
+                userReview.id
+            );
 
-        setEditing(false);
-        setReviews(await getBookReviews(bookId));
+            setEditing(false);
+            setReviews(await getBookReviews(bookId));
+        } catch (err) {
+            console.error("Ошибка при редактировании отзыва:", err);
+        }
     };
 
 
     useEffect(() => {
         if (isOpen) {
-            getBookReviews(bookId).then(setReviews);
-            console.log(getBookReviews(bookId))
+            getBookReviews(bookId).then(setReviews).catch(err => {
+                console.error("Ошибка загрузки отзывов:", err);
+            });
         }
-
-        console.log(userReview)
     }, [bookId, isOpen]);
 
     const submit = async () => {
-        await createReview(bookId, {
-            rating,
-            comment
-        });
+        try {
+            await createReview(bookId, {
+                rating,
+                comment
+            });
 
-        setComment("");
-        setReviews(await getBookReviews(bookId));
+            setComment("");
+            setReviews(await getBookReviews(bookId));
+        } catch (err) {
+            console.error("Ошибка при отправке отзыва:", err);
+        }
     };
 
     if (!isOpen) return null;
