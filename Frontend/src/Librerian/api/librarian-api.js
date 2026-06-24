@@ -113,10 +113,11 @@ export async function approveAccessRequest(requestId) {
 
     if (!res.ok) {
         const msg = await res.text();
-        console.error(`Ошибка одобрения запроса: ${msg}`)
+        console.error(`Ошибка одобрения запроса: ${msg}`);
+        return;
     }
 
-    return res.json();
+    return await res.json();
 }
 
 export async function createLimitRequest(groupId, bookId, requestedLimit) {

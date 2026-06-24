@@ -77,7 +77,7 @@ export default function UserBookModal({ isOpen, onClose, book, id }) {
                 </div>
                 <div className="modal-content">
                     <p><b>Автор:</b> {book.author}</p>
-                    <p><b>Жанр:</b> {book.genre.genreName}</p>
+                    <p><b>Жанр:</b> {book.genre ?? null}</p>
                     <p><b>Описание:</b> {book.description}</p>
                 </div>
                 <div className="modal-buttons">

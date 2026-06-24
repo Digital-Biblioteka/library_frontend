@@ -1,5 +1,7 @@
-import React, { useEffect, useRef, useState, useMemo } from "react";
+import React, { useEffect, useRef, useState} from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { Client } from "@stomp/stompjs";
+import SockJS from "sockjs-client";
 import "./reader.css";
 import "./bookmark.css";
 import {
@@ -9,7 +11,10 @@ import {
     getChapByToc,
     getChapByIdx
 } from "./api/readerApi";
-import { getBookmarkGroupsByBook } from "./api/bookmarkApi";
+import {
+    getUsersBookmarksGroups,
+    getAllBookmarksInGroup
+} from "./api/bookmarkApi";
 import { searchContent } from "./api/contentSearchApi";
 import { useBookmarks, BookmarksPanel } from "./Bookmark";
 import { IconSearch } from "./Icons";
@@ -83,7 +88,6 @@ const getSelectedBookmarkData = (container, event) => {
         startElement?.closest(".bookmark-text-highlight") ||
         endElement?.closest(".bookmark-text-highlight")
     ) {
-        alert("Нельзя создавать новую закладку внутри уже подсвеченного текста");
         return null;
     }
 
@@ -198,30 +202,10 @@ const getBookmarkEndOffset = (bookmark) =>
     bookmark?.endOffset ?? bookmark?.end_offset ?? 0;
 
 const getBookmarkGroupId = (bookmark) =>
-    bookmark?.groupID ?? bookmark?.groupId ?? null;
-
-const getBookmarkGroupName = (bookmark, groupId) =>
-    bookmark?.group?.name
-    ?? bookmark?.bookmarkGroup?.name
-    ?? bookmark?.groupName
-    ?? `Группа ${groupId}`;
-
-const buildGroupsFromBookmarks = (bookmarks) => {
-    const map = new Map();
-
-    bookmarks.forEach((bookmark) => {
-        const groupId = getBookmarkGroupId(bookmark);
-
-        if (!groupId || map.has(String(groupId))) return;
-
-        map.set(String(groupId), {
-            id: groupId,
-            name: getBookmarkGroupName(bookmark, groupId)
-        });
-    });
-
-    return Array.from(map.values());
-};
+    bookmark?.groupID
+    ?? bookmark?.groupId
+    ?? bookmark?.group?.id
+    ?? null;
 
 const TocItem = ({ item, goToItem, level = 0 }) => (
     <div>
@@ -275,10 +259,57 @@ const Reader = () => {
     const [bookmarkGroupId, setBookmarkGroupId] = useState("");
     const [bookmarkVisibilityMode, setBookmarkVisibilityMode] = useState("ALL");
     const [visibleGroupIds, setVisibleGroupIds] = useState([]);
+    const [bookmarkGroups, setBookmarkGroups] = useState([]);
+    const [visibleGroupBookmarks, setVisibleGroupBookmarks] = useState([]);
+    const [groupedBookmarkIds, setGroupedBookmarkIds] = useState([]);
 
     const [searchVis, setSearchVis] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState([]);
+
+    const visibleGroupIdsRef = useRef([]);
+    const bookmarkVisibilityModeRef = useRef("ALL");
+
+    useEffect(() => {
+        visibleGroupIdsRef.current = visibleGroupIds;
+    }, [visibleGroupIds]);
+
+    useEffect(() => {
+        bookmarkVisibilityModeRef.current = bookmarkVisibilityMode;
+    }, [bookmarkVisibilityMode]);
+
+    const refreshGroupedBookmarkIds = async () => {
+        if (!bookmarkGroups.length) {
+            setGroupedBookmarkIds([]);
+            return [];
+        }
+
+        const ids = [];
+
+        for (const group of bookmarkGroups) {
+            const groupId =
+                group.id
+                ?? group.groupID
+                ?? group.groupId;
+
+            if (!groupId) continue;
+
+            const groupBookmarks = await getAllBookmarksInGroup(groupId);
+
+            groupBookmarks?.forEach(bookmark => {
+                ids.push(Number(bookmark.id));
+            });
+        }
+
+        const uniqueIds = Array.from(new Set(ids));
+
+        setGroupedBookmarkIds(uniqueIds);
+        return uniqueIds;
+    };
+
+    useEffect(() => {
+        refreshGroupedBookmarkIds();
+    }, [bookmarkGroups]);
 
     const {
         bookmarks,
@@ -288,28 +319,138 @@ const Reader = () => {
         refresh: refreshBookmarks
     } = useBookmarks(id);
 
+    const refreshBookmarkGroups = async () => {
+        if (!id) return [];
+
+        const groups = await getUsersBookmarksGroups(id);
+        setBookmarkGroups(groups || []);
+        return groups || [];
+    };
+
+    useEffect(() => {
+        refreshBookmarkGroups();
+    }, [id]);
+
+    const refreshVisibleGroupBookmarks = async () => {
+        if (
+            bookmarkVisibilityMode !== "SELECTED_GROUPS" ||
+            visibleGroupIds.length === 0
+        ) {
+            setVisibleGroupBookmarks([]);
+            return [];
+        }
+
+        const result = [];
+
+        for (const groupId of visibleGroupIds) {
+            const groupBookmarks = await getAllBookmarksInGroup(groupId);
+            result.push(...(groupBookmarks || []));
+        }
+
+        const unique = Array.from(
+            new Map(result.map(bookmark => [bookmark.id, bookmark])).values()
+        );
+
+        setVisibleGroupBookmarks(unique);
+        return unique;
+    };
+
+    useEffect(() => {
+        refreshVisibleGroupBookmarks();
+    }, [
+        bookmarkVisibilityMode,
+        visibleGroupIds
+    ]);
+
+    useEffect(() => {
+        if (!id || bookmarkGroups.length === 0) return;
+
+        const client = new Client({
+            webSocketFactory: () => new SockJS("http://localhost:8080/ws"),
+            reconnectDelay: 5000,
+
+            debug: (str) => {
+                console.log("STOMP:", str);
+            },
+
+            onConnect: () => {
+                console.log("WS CONNECTED");
+                bookmarkGroups.forEach(group => {
+                    const groupId =
+                        group.id
+                        ?? group.groupID
+                        ?? group.groupId;
+
+                    console.log("SUBSCRIBE TO:", `/topic/bookmarks/${groupId}`);
+
+                    if (!groupId) return;
+
+                    client.subscribe(`/topic/bookmarks/${groupId}`, async (message) => {
+                        console.log("WS bookmark event:", message.body);
+
+                        await refreshBookmarks();
+
+                        const currentVisibleGroupIds = visibleGroupIdsRef.current;
+                        const currentMode = bookmarkVisibilityModeRef.current;
+
+                        if (
+                            currentMode === "SELECTED_GROUPS" &&
+                            currentVisibleGroupIds.length > 0
+                        ) {
+                            const result = [];
+
+                            for (const visibleGroupId of currentVisibleGroupIds) {
+                                const groupBookmarks = await getAllBookmarksInGroup(visibleGroupId);
+                                result.push(...(groupBookmarks || []));
+                            }
+
+                            const unique = Array.from(
+                                new Map(result.map(bookmark => [bookmark.id, bookmark])).values()
+                            );
+
+                            setVisibleGroupBookmarks(unique);
+                        }
+
+                        await refreshBookmarkGroups();
+                    });
+                });
+            },
+
+            onStompError: (frame) => {
+                console.error("STOMP ERROR:", frame);
+            },
+
+            onWebSocketError: (error) => {
+                console.error("WS ERROR:", error);
+            }
+        });
+
+        client.activate();
+
+        return () => {
+            client.deactivate();
+        };
+    }, [id, bookmarkGroups]);
+
     const shouldShowBookmark = (bookmark) => {
+        const bookmarkId = Number(bookmark.id);
+
         if (bookmarkVisibilityMode === "ALL") {
             return true;
         }
 
-        const groupId = getBookmarkGroupId(bookmark);
-
         if (bookmarkVisibilityMode === "NO_GROUP") {
-            return !groupId;
+            return !groupedBookmarkIds.includes(bookmarkId);
         }
 
         if (bookmarkVisibilityMode === "SELECTED_GROUPS") {
-            return groupId && visibleGroupIds.includes(String(groupId));
+            return visibleGroupBookmarks.some(
+                groupBookmark => Number(groupBookmark.id) === bookmarkId
+            );
         }
 
         return true;
     };
-
-    const bookmarkGroups = useMemo(
-        () => buildGroupsFromBookmarks(bookmarks),
-        [bookmarks]
-    );
 
     const [fontSize, setFontSize] = useState(
         Number(localStorage.getItem("reader-font")) || 18
@@ -332,13 +473,22 @@ const Reader = () => {
         if (!container) return;
 
         requestAnimationFrame(() => {
+            if (!containerRef.current) return;
             unwrapBookmarkHighlights(container);
 
             const blocks = prepareBookmarkBlocks(container);
 
-            const currentBookmarks = bookmarks
-                .filter(bookmark => Number(getBookmarkSpineRef(bookmark)) === Number(spineIdx))
-                .filter(shouldShowBookmark)
+            const sourceBookmarks =
+                bookmarkVisibilityMode === "SELECTED_GROUPS"
+                    ? visibleGroupBookmarks
+                    : bookmarks;
+
+            const currentBookmarks = sourceBookmarks
+                .filter(
+                    bookmark =>
+                        Number(getBookmarkSpineRef(bookmark)) === Number(spineIdx)
+                )
+                .filter(bookmark => shouldShowBookmark(bookmark))
                 .sort(
                     (a, b) =>
                         Number(getBookmarkStartOffset(b)) -
@@ -375,7 +525,14 @@ const Reader = () => {
                 );
             });
         });
-    }, [html, bookmarks, spineIdx]);
+    }, [
+        bookmarks,
+        spineIdx,
+        bookmarkVisibilityMode,
+        visibleGroupIds,
+        visibleGroupBookmarks,
+        groupedBookmarkIds
+    ]);
 
     useEffect(() => {
         setProgress(total > 1 ? spineIdx / (total - 1) : 0);
@@ -408,7 +565,7 @@ const Reader = () => {
         return () => {
             container.removeEventListener("contextmenu", handleContextMenu);
         };
-    }, [html]);
+    }, [html, spineIdx]);
 
     const highlightBlock = (block) => {
         block.classList.add("search-highlight-block");
@@ -641,8 +798,10 @@ const Reader = () => {
         window.getSelection()?.removeAllRanges();
     };
 
-    const openBookmarkCreateModal = () => {
+    const openBookmarkCreateModal = async () => {
         if (!bookmarkDraft) return;
+
+        await refreshBookmarkGroups();
 
         setSelectionMenu(null);
         setBookmarkNote("");
@@ -658,13 +817,18 @@ const Reader = () => {
             paragraphIdx: bookmarkDraft.paragraphIdx,
             startOffset: bookmarkDraft.startOffset,
             endOffset: bookmarkDraft.endOffset,
-            groupID: bookmarkGroupId || null,
+            groupID: bookmarkGroupId ? Number(bookmarkGroupId) : null,
             text: bookmarkNote || "",
             selectedText: bookmarkDraft.selectedText,
             color: bookmarkColor
         };
 
         await addBookmark(bookmarkDto);
+
+        await refreshBookmarks();
+        await refreshBookmarkGroups();
+        await refreshGroupedBookmarkIds();
+        await refreshVisibleGroupBookmarks();
 
         closeBookmarkCreateModal();
         setBmVis(true);
@@ -698,14 +862,6 @@ const Reader = () => {
                         ☽
                     </button>
 
-                    <button className="close-btn" onClick={() => setTocVis(v => !v)}>
-                        ☰
-                    </button>
-
-                    <button className="bookmark-btn" onClick={() => setBmVis(v => !v)}>
-                        ⚐
-                    </button>
-
                     <button
                         className="search-btn-reader"
                         onClick={() => setSearchVis(v => !v)}
@@ -715,6 +871,15 @@ const Reader = () => {
                 </div>
 
                 <div className="header-center">{title}</div>
+
+                <div className="header-right">
+                    <button className="bookmark-btn" onClick={() => setBmVis(v => !v)}>
+                        Закладки
+                    </button>
+                    <button className="bookmark-btn" onClick={() => setTocVis(v => !v)}>
+                        Оглавление
+                    </button>
+                </div>
             </div>
 
             <div className="reader-progress">
@@ -732,7 +897,7 @@ const Reader = () => {
                         top: selectionMenu.y
                     }}
                 >
-                    <button onClick={openBookmarkCreateModal}>
+                    <button onClick={() => openBookmarkCreateModal()}>
                         Добавить закладку?
                     </button>
                 </div>
@@ -782,13 +947,23 @@ const Reader = () => {
                                     value={bookmarkGroupId}
                                     onChange={(e) => setBookmarkGroupId(e.target.value)}
                                 >
-                                    <option value="">Личная закладка</option>
+                                    <option onClick={() => setBookmarkGroupId(null)}>
+                                        без группы</option>
+                                    {bookmarkGroups.map(group => {
+                                        const groupId =
+                                            group.id
+                                            ?? group.groupID
+                                            ?? group.groupId;
 
-                                    {bookmarkGroups.map(group => (
-                                        <option key={group.id} value={group.id}>
-                                            {group.name}
-                                        </option>
-                                    ))}
+                                        return (
+                                            <option
+                                                key={groupId}
+                                                value={groupId}
+                                                onClick={() => setBookmarkGroupId(groupId)}>
+                                                {group.name}
+                                            </option>
+                                        );
+                                    })}
                                 </select>
                             </label>
                         )}
@@ -810,6 +985,9 @@ const Reader = () => {
                 <BookmarksPanel
                     bookId={id}
                     bookmarks={bookmarks}
+                    groups={bookmarkGroups}
+                    groupedBookmarkIds={groupedBookmarkIds}
+                    onRefreshGroups={refreshBookmarkGroups}
                     bookmarkVisibilityMode={bookmarkVisibilityMode}
                     onBookmarkVisibilityModeChange={setBookmarkVisibilityMode}
                     visibleGroupIds={visibleGroupIds}

@@ -7,14 +7,21 @@ import {
     createBookmarksGroup,
     joinBookmarksGroup,
     addBookmarkToGroup,
-    getUsersBookmarksGroups,
-    deleteBookmarkGroup
+    deleteBookmarkGroup,
+    getAllBookmarksInGroup
 } from "./api/bookmarkApi";
 
 const getBookmarkGroupId = (bookmark) => (
     bookmark?.groupID
     ?? bookmark?.groupId
     ?? bookmark?.group?.id
+    ?? null
+);
+
+const getGroupId = (group) => (
+    group?.id
+    ?? group?.groupID
+    ?? group?.groupId
     ?? null
 );
 
@@ -28,6 +35,12 @@ const getSelectedText = (bookmark) => (
     bookmark?.selectedText
     ?? bookmark?.selected_text
     ?? "Выделенный текст"
+);
+
+const getBookmarkAuthor = (bookmark) => (
+    bookmark?.user?.username
+    ?? bookmark?.user?.email
+    ?? ""
 );
 
 export function useBookmarks(bookId) {
@@ -80,6 +93,9 @@ export function useBookmarks(bookId) {
 export const BookmarksPanel = ({
                                    bookId,
                                    bookmarks,
+                                   groups = [],
+                                   groupedBookmarkIds = [],
+                                   onRefreshGroups,
                                    bookmarkVisibilityMode,
                                    onBookmarkVisibilityModeChange,
                                    visibleGroupIds,
@@ -89,7 +105,6 @@ export const BookmarksPanel = ({
                                    onUpdate,
                                    onRefresh
                                }) => {
-    const [groups, setGroups] = useState([]);
 
     const [showCreateForm, setShowCreateForm] = useState(false);
     const [showJoinForm, setShowJoinForm] = useState(false);
@@ -102,27 +117,71 @@ export const BookmarksPanel = ({
     const [selectedGroupId, setSelectedGroupId] = useState("");
     const [loadingGroups, setLoadingGroups] = useState(false);
     const [error, setError] = useState("");
+    const [createdGroupInviteLink, setCreatedGroupInviteLink] = useState("");
 
-    const loadGroups = async () => {
-        if (!bookId) return;
+    const [groupBookmarks, setGroupBookmarks] = useState([]);
+    const [visiblePanelBookmarks, setVisiblePanelBookmarks] = useState([]);
 
-        setLoadingGroups(true);
-        try {
-            const data = await getUsersBookmarksGroups(bookId);
-            console.log(data)
-            setGroups(data || []);
-        } finally {
-            setLoadingGroups(false);
+    const noGroupBookmarks = bookmarks.filter(
+        bm => !groupedBookmarkIds.includes(Number(bm.id))
+    );
+
+    const loadVisiblePanelBookmarks = async () => {
+        if (
+            bookmarkVisibilityMode !== "SELECTED_GROUPS" ||
+            visibleGroupIds.length === 0
+        ) {
+            setVisiblePanelBookmarks([]);
+            return [];
         }
+
+        const result = [];
+
+        for (const groupId of visibleGroupIds) {
+            const data = await getAllBookmarksInGroup(groupId);
+            result.push(...(data || []));
+        }
+
+        const unique = Array.from(
+            new Map(result.map(bookmark => [bookmark.id, bookmark])).values()
+        );
+
+        setVisiblePanelBookmarks(unique);
+        return unique;
     };
 
     useEffect(() => {
-        loadGroups();
-    }, [bookId]);
+        loadVisiblePanelBookmarks();
+    }, [bookmarkVisibilityMode, visibleGroupIds]);
 
-    const noGroupBookmarks = bookmarks.filter(bm => !getBookmarkGroupId(bm));
+    const loadSelectedGroupBookmarks = async () => {
+        if (!selectedGroupId || selectedGroupId === "NO_GROUP") {
+            setGroupBookmarks([]);
+            return [];
+        }
+
+        const data = await getAllBookmarksInGroup(selectedGroupId);
+        setGroupBookmarks(data || []);
+        return data || [];
+    };
+
+    useEffect(() => {
+        loadSelectedGroupBookmarks();
+    }, [selectedGroupId]);
 
     const getPanelBookmarks = () => {
+        if (bookmarkVisibilityMode === "ALL") {
+            return bookmarks;
+        }
+
+        if (bookmarkVisibilityMode === "NO_GROUP") {
+            return noGroupBookmarks;
+        }
+
+        if (bookmarkVisibilityMode === "SELECTED_GROUPS") {
+            return visiblePanelBookmarks;
+        }
+
         if (!selectedGroupId) {
             return bookmarks;
         }
@@ -131,9 +190,7 @@ export const BookmarksPanel = ({
             return noGroupBookmarks;
         }
 
-        return bookmarks.filter(
-            bm => String(getBookmarkGroupId(bm)) === String(selectedGroupId)
-        );
+        return groupBookmarks;
     };
 
     const handleDeleteGroup = async (groupId) => {
@@ -150,7 +207,6 @@ export const BookmarksPanel = ({
             );
 
             await onRefresh?.();
-            await loadGroups();
         } catch (err) {
             setError(err.message || "Не удалось удалить группу");
         }
@@ -172,6 +228,12 @@ export const BookmarksPanel = ({
         return visibleGroupIds.includes(groupId);
     };
 
+    const buildInviteLink = (accessToken) => {
+        if (!accessToken) return "";
+
+        return `${window.location.origin}/bookmarks/groups/join/${accessToken}`;
+    };
+
     const handleCreateGroup = async (e) => {
         e.preventDefault();
         setError("");
@@ -181,11 +243,29 @@ export const BookmarksPanel = ({
             return;
         }
 
+        setLoadingGroups(true);
+
         try {
             const createdGroup = await createBookmarksGroup(bookId, {
                 name: groupName.trim(),
                 visibility: groupVisibility
             });
+
+            const accessToken =
+                createdGroup?.accessToken
+                ?? createdGroup?.access_token
+                ?? createdGroup?.inviteToken
+                ?? createdGroup?.token
+                ?? "";
+
+            if (groupVisibility === "BY_LINK" && accessToken) {
+                setCreatedGroupInviteLink(buildInviteLink(accessToken));
+            } else {
+                setCreatedGroupInviteLink("");
+            }
+
+            await onRefresh?.();
+            await onRefreshGroups?.();
 
             const createdGroupId =
                 createdGroup?.id
@@ -194,10 +274,8 @@ export const BookmarksPanel = ({
 
             if (createdGroupId && initialBookmarkId) {
                 await addBookmarkToGroup(initialBookmarkId, createdGroupId);
+                await onRefresh?.()
             }
-
-            await onRefresh?.();
-            await loadGroups();
 
             if (createdGroupId) {
                 setSelectedGroupId(String(createdGroupId));
@@ -209,6 +287,8 @@ export const BookmarksPanel = ({
             setShowCreateForm(false);
         } catch (err) {
             setError(err.message || "Не удалось создать группу");
+        } finally {
+            setLoadingGroups(false)
         }
     };
 
@@ -221,6 +301,8 @@ export const BookmarksPanel = ({
             return;
         }
 
+        setLoadingGroups(true);
+
         try {
             await joinBookmarksGroup(joinToken.trim());
 
@@ -228,21 +310,42 @@ export const BookmarksPanel = ({
             setShowJoinForm(false);
 
             await onRefresh?.();
-            await loadGroups();
+            await onRefreshGroups?.();
         } catch (err) {
             setError(err.message || "Не удалось присоединиться к группе");
+        } finally {
+            setLoadingGroups(false);
+        }
+    };
+
+    const handleAddBookmarkToGroup = async (bookmarkId, groupId) => {
+        if (!bookmarkId || !groupId) return;
+
+        setError("");
+
+        console.log(bookmarkId, groupId)
+
+        try {
+            await addBookmarkToGroup(bookmarkId, groupId);
+
+            await onRefresh?.();
+            await onRefreshGroups?.();
+
+            await loadSelectedGroupBookmarks();
+            await loadVisiblePanelBookmarks();
+
+            if (String(groupId) === String(selectedGroupId)) {
+                await loadSelectedGroupBookmarks();
+            }
+        } catch (err) {
+            setError(err.message || "Не удалось добавить закладку в группу");
         }
     };
 
     const handleAddBookmarkToActiveGroup = async (bookmarkId) => {
-        if (!selectedGroupId) return;
+        if (!selectedGroupId || selectedGroupId === "NO_GROUP") return;
 
-        try {
-            await addBookmarkToGroup(bookmarkId, selectedGroupId);
-            await onRefresh?.();
-        } catch (err) {
-            setError(err.message || "Не удалось добавить закладку в группу");
-        }
+        await handleAddBookmarkToGroup(bookmarkId, selectedGroupId);
     };
 
     return (
@@ -284,6 +387,36 @@ export const BookmarksPanel = ({
                         Создать
                     </button>
                 </form>
+            )}
+
+            {createdGroupInviteLink && (
+                <div className="bookmark-invite-link-box">
+                    <div className="bookmark-groups-title">
+                        Ссылка для приглашения
+                    </div>
+
+                    <input
+                        type="text"
+                        readOnly
+                        value={createdGroupInviteLink}
+                        onFocus={(e) => e.target.select()}
+                    />
+
+                    <button
+                        type="button"
+                        className="save-btn"
+                        onClick={async () => {
+                            try {
+                                await navigator.clipboard.writeText(createdGroupInviteLink);
+                                setCreatedGroupInviteLink(false);
+                            } catch (err) {
+                                console.error('Failed to copy:', err);
+                            }
+                        }}
+                    >
+                        Скопировать
+                    </button>
+                </div>
             )}
 
             {showJoinForm && (
@@ -341,22 +474,29 @@ export const BookmarksPanel = ({
 
                 {groups.map(group => {
                     const groupId = String(group.id ?? group.groupID ?? group.groupId);
+                    const active = isVisibleGroup(groupId);
 
                     return (
-                        <div key={groupId} className="bookmark-group-row">
+                        <div
+                            key={groupId}
+                            className={`bookmark-group-row ${active ? "active" : ""}`}
+                        >
                             <label className="bookmark-group-check">
                                 <input
                                     type="checkbox"
                                     disabled={bookmarkVisibilityMode !== "SELECTED_GROUPS"}
-                                    checked={isVisibleGroup(groupId)}
+                                    checked={active}
                                     onChange={() => toggleVisibleGroup(groupId)}
                                 />
-                                {group.name}
+
+                                <span className="bookmark-group-name">
+                                    {group.name}
+                                </span>
                             </label>
 
                             <button
                                 type="button"
-                                className="delete-btn"
+                                className="bookmark-group-delete"
                                 onClick={() => handleDeleteGroup(groupId)}
                                 title="Удалить группу"
                             >
@@ -379,16 +519,19 @@ export const BookmarksPanel = ({
                 <div key={bm.id} className="bookmark-item">
                     <Bookmark
                         bm={bm}
+                        groups={groups}
                         selectedGroupId={selectedGroupId}
                         onSelect={onSelect}
                         onDelete={onDelete}
                         onUpdate={onUpdate}
+                        onAddToGroup={handleAddBookmarkToGroup}
                     />
                 </div>
             ))}
 
-            {selectedGroupId && selectedGroupId !== "NO_GROUP" && noGroupBookmarks.length > 0 && (                <div className="bookmark-add-to-group-list">
-                    <h4>Добавить личную закладку в группу</h4>
+            {selectedGroupId && selectedGroupId !== "NO_GROUP" && noGroupBookmarks.length > 0 && (
+                <div className="bookmark-add-to-group-list">
+                    <h4>Добавить закладку в эту группу</h4>
 
                     {noGroupBookmarks.map(bm => (
                         <button
@@ -407,19 +550,36 @@ export const BookmarksPanel = ({
 
 export const Bookmark = ({
                              bm,
+                             groups = [],
                              selectedGroupId,
                              onSelect,
                              onDelete,
-                             onUpdate
+                             onUpdate,
+                             onAddToGroup
                          }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [note, setNote] = useState(getBookmarkText(bm));
+    const author = getBookmarkAuthor(bm);
+    const bookmarkColor = bm.color || "#90caf9";
+
+    const [targetGroupId, setTargetGroupId] = useState(
+        getBookmarkGroupId(bm) ? String(getBookmarkGroupId(bm)) : ""
+    );
 
     const selectedText = getSelectedText(bm);
     const savedNote = getBookmarkText(bm);
 
+    const handleChangeGroup = async () => {
+        if (!targetGroupId) return;
+
+        await onAddToGroup?.(bm.id, targetGroupId);
+    };
+
     useEffect(() => {
         setNote(getBookmarkText(bm));
+        setTargetGroupId(
+            getBookmarkGroupId(bm) ? String(getBookmarkGroupId(bm)) : ""
+        );
     }, [bm]);
 
     const handleSave = async () => {
@@ -442,36 +602,77 @@ export const Bookmark = ({
         setIsEditing(false);
     };
 
+    const previewText =
+        selectedText.length > 150
+            ? `${selectedText.slice(0, 150)}...`
+            : selectedText;
+
     return (
         <div className="bookmark-card">
             <div
                 className="bookmark-card-text"
                 onClick={() => onSelect(bm)}
             >
-                “{selectedText}”
+                “{previewText}”
             </div>
 
             {!isEditing ? (
                 <>
                     <div className="bookmark-card-note">
-                        {savedNote
-                            ? savedNote
-                            : <span className="bookmark-empty-note">Без заметки</span>}
+                        <div className="bookmark-note-header">
+                            <span
+                                className="bookmark-note-color"
+                                style={{ backgroundColor: bookmarkColor }}
+                            />
+
+                            <span className="bookmark-note-author">
+                                {author}
+                            </span>
+                        </div>
+
+                        <div className="bookmark-note-text">
+                            {savedNote
+                                ? savedNote
+                                : <span className="bookmark-empty-note">Без заметки</span>}
+                        </div>
+                    </div>
+
+                    <div className="bookmark-card-group">
+                        <select
+                            value={targetGroupId}
+                            onChange={(e) => setTargetGroupId(e.target.value)}
+                        >
+                            <option >Без группы</option>
+
+                            {groups.map(group => {
+                                const groupId = getGroupId(group);
+
+                                return (
+                                    <option key={groupId} value={groupId}>
+                                        {group.name}
+                                    </option>
+                                );
+                            })}
+                        </select>
                     </div>
 
                     <div className="bookmark-card-actions">
+                        <button
+                            className="save-btn"
+                            disabled={!targetGroupId}
+                            onClick={handleChangeGroup}>
+                            Добавить в группу
+                        </button>
                         <button className="add-btn" onClick={() => setIsEditing(true)}>
                             Редактировать
                         </button>
 
-                        {!selectedGroupId && (
-                            <button
-                                className="delete-btn"
-                                onClick={() => onDelete(bm.id)}
-                            >
-                                Удалить
-                            </button>
-                        )}
+                        <button
+                            className="delete-btn"
+                            onClick={() => onDelete(bm.id)}
+                        >
+                            Удалить
+                        </button>
                     </div>
                 </>
             ) : (

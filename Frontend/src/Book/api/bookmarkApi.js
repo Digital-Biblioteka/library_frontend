@@ -103,6 +103,8 @@ export async function createBookmarksGroup (bookId, bookmarkGroupInfo) {
         const err = await res.text();
         console.error(`Ошибка создания группы закладок: ${err}`)
     }
+
+    return await res.json();
 }
 
 export async function deleteBookmarkGroup (groupId) {
