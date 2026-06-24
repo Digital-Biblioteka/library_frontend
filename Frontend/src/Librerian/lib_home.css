@@ -414,3 +414,19 @@
         transform: translateY(0);
     }
 }
+
+.request-card-disabled {
+    opacity: 0.55;
+    pointer-events: none;
+}
+
+.request-card-disabled button {
+    cursor: not-allowed;
+}
+
+.request-warning {
+    margin-top: 8px;
+    color: #b45309;
+    font-size: 14px;
+    font-weight: 500;
+}
